@@ -1,0 +1,9 @@
+<project name="handball-basisplugin" basedir="." default="main">
+
+    <target name="main">
+        <copy todir="E:\wamp\www\wp\wp-content\plugins\${ant.project.name}">
+            <fileset dir="." includes="${ant.project.name}.php, classes/*" />
+        </copy>
+    </target>
+
+</project>

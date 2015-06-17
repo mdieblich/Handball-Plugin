@@ -3,11 +3,23 @@ class Spielposition{
 	private $bezeichnung;
 	private $abkuerzung;
 	
-	// TODO Konstruktor, getter, Setter, statische Objekte
+	// TODO statische Objekte
 	
-	function __construct($bezeichnung, $abkuerzung){
-		
+	private function __construct($bezeichnung, $abkuerzung){
+		$this->bezeichnung = $bezeichnung;
+		$this->abkuerzung = $abkuerzung;
 	}
 	
+	public function getBezeichnung(){
+		return $this->bezeichnung;
+	}
+	
+	public function getAbkuerzung(){
+		return $this->abkuerzung;
+	}
+	
+	public static $TRAINER, $TORWART;
+	
 }
+$TORWART = new Spielposition("Torwart", "TW")
 ?>
