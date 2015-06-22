@@ -1,3 +1,4 @@
+<!DOCTYPE project>
 <project name="handball-basisplugin" basedir="." default="main">
 
     <target name="clean">
