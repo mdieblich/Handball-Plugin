@@ -1,5 +1,5 @@
 <?php
-class Spielposition{
+class Handbase_Spielposition{
 	private $bezeichnung;
 	private $abkuerzung;
 	
@@ -37,13 +37,13 @@ class Spielposition{
 	}
 	
 }
-Spielposition::$TRAINER = new Spielposition("Trainer", "Tr");
+Handbase_Spielposition::$TRAINER = new Handbase_Spielposition("Trainer", "Tr");
 
-Spielposition::$TORWART = new Spielposition("Torwart", "TW");
-Spielposition::$LINKS_AUSSEN = new Spielposition("Links außen", "LA");
-Spielposition::$RUECKRAUM_LINKS = new Spielposition("Rückraum links", "RL");
-Spielposition::$MITTE = new Spielposition("Mitte", "RM");
-Spielposition::$RUECKRAUM_RECHTS = new Spielposition("Rückraum rechts", "RR");
-Spielposition::$RECHTS_AUSSEN = new Spielposition("Rechts außen", "RA");
-Spielposition::$KREIS = new Spielposition("Kreis", "KR");
+Handbase_Spielposition::$TORWART = new Handbase_Spielposition("Torwart", "TW");
+Handbase_Spielposition::$LINKS_AUSSEN = new Handbase_Spielposition("Links außen", "LA");
+Handbase_Spielposition::$RUECKRAUM_LINKS = new Handbase_Spielposition("Rückraum links", "RL");
+Handbase_Spielposition::$MITTE = new Handbase_Spielposition("Mitte", "RM");
+Handbase_Spielposition::$RUECKRAUM_RECHTS = new Handbase_Spielposition("Rückraum rechts", "RR");
+Handbase_Spielposition::$RECHTS_AUSSEN = new Handbase_Spielposition("Rechts außen", "RA");
+Handbase_Spielposition::$KREIS = new Handbase_Spielposition("Kreis", "KR");
 ?>

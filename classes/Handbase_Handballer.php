@@ -1,8 +1,8 @@
 <?php
 
-require_once("Spielposition.php");
+require_once("Handbase_Spielposition.php");
 
-class Handballer{
+class Handbase_Handballer{
 	
 	private $user_id;
 	/** Auf welcher Position spielt dieser Spieler? */
@@ -21,7 +21,7 @@ class Handballer{
 	
 	private function load_positionen(){
 		$this->positionen = array();
-		foreach (Spielposition::alle_positionen() as $position){
+		foreach (Handbase_Spielposition::alle_positionen() as $position){
 			if($this->get_meta($position->get_meta_name())){
 				$this->positionen[] = $position;
 			}	
@@ -50,7 +50,7 @@ class Handballer{
 	}
 	
 	private function ensure_spielposition($position){
-		if(! ($position instanceof Spielposition)){
+		if(! ($position instanceof Handbase_Spielposition)){
 			ob_start();
 			var_dump($position);
 			throw new Exception("Position ist murks: " + $ob_get_clean());
@@ -62,7 +62,7 @@ class Handballer{
 	}
 	
 	private function save_positionen(){
-		foreach(Spielposition::alle_positionen() as $position){
+		foreach(Handbase_Spielposition::alle_positionen() as $position){
 			$this->set_meta($position->get_meta_name(), $this->plays_on_position($position));
 		}
 	}

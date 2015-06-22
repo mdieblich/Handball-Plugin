@@ -27,15 +27,14 @@ function handbase_show_extra_profile_fields( $user ) { ?>
 <?php }
 
 function handbase_show_positions_profile_fields($user){
-	require_once 'classes/Handballer.php';
-	require_once 'classes/Spielposition.php';
-	$handballer = new Handballer($user->ID);
+	require_once 'classes/Handbase_Handballer.php';
+	$handballer = new Handbase_Handballer($user->ID);
 	?><tr>
 <th><label for="position">Positionen</label></th>
 
 <td><fieldset><?php 
 
-	foreach(Spielposition::alle_positionen() as $position){
+	foreach(Handbase_Spielposition::alle_positionen() as $position){
 		$abkuerzung = $position->get_abkuerzung();
 		$bezeichnung = $position->get_bezeichnung();
 		$checked = $handballer->plays_on_position($position)?'checked':'';
@@ -58,14 +57,13 @@ function handbase_save_extra_profile_fields( $user_id ) {
 	if ( !current_user_can( 'edit_user', $user_id ) )
 		return false;
 
-	require_once 'classes/Handballer.php';
-	require_once 'classes/Spielposition.php';
-	$handballer = new Handballer($user_id);
+	require_once 'classes/Handbase_Handballer.php';
+	$handballer = new Handbase_Handballer($user_id);
 
 	/* Copy and paste this line for additional fields. Make sure to change 'twitter' to the field ID. */
 // 	update_usermeta( $user_id, 'position', $_POST['position'] );
 
-	foreach(Spielposition::alle_positionen() as $position){
+	foreach(Handbase_Spielposition::alle_positionen() as $position){
 		$abkuerzung = $position->get_abkuerzung();
 		$position_field_name = 'position_'.$abkuerzung;
 		$plays_position = $_POST[$position_field_name];

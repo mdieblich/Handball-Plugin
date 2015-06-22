@@ -1,10 +1,18 @@
 ﻿<!DOCTYPE project>
 <project name="handball-basisplugin" basedir="." default="main">
+	
+	<property name="wordpress.dir" value="C:\wamp\www\wp\wp-content"/>
+	<property name="wordpress.plugin" value="${wordpress.dir}\plugins"/>
+	<property name="target.dir" value="${wordpress.plugin}\${ant.project.name}"/>
 
     <target name="main">
-        <copy todir="C:\wamp\www\wp\wp-content\plugins\${ant.project.name}">
+        <copy todir="${target.dir}">
             <fileset dir="." includes="${ant.project.name}.php, classes/*" />
         </copy>
     </target>
+	
+	<target name="clean">
+		<delete dir="${target.dir}" />
+	</target>
 
 </project>
