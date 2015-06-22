@@ -9,6 +9,15 @@ class Handballer{
 	/** Auf welcher Position spielt dieser Spieler? */
 	private $positionen;
 	
+	/** Hauptmannschaft, in der man drin ist */
+	private $stammmanschaft;
+	
+	/** Mannschaft, in die man rein möchte (überschreibt stammmannschaft) */
+	private $wunschmannschaft;
+	
+	/** Mannschaften, die man "abonniert" hat */
+	private $zusatzmannschaften;
+	
 	public function __construct($user_id){
 		$this->user_id = $user_id;
 	}
