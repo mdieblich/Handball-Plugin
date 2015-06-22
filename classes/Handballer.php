@@ -1,8 +1,9 @@
 <?php
 
-require_once("Handbase_Spielposition.php");
+namespace handball;
+require_once("Spielposition.php");
 
-class Handbase_Handballer{
+class Handballer{
 	
 	private $user_id;
 	/** Auf welcher Position spielt dieser Spieler? */
@@ -28,7 +29,7 @@ class Handbase_Handballer{
 			</th>
 			<td>
 				<fieldset><?php 
-					foreach(Handbase_Spielposition::alle_positionen() as $position){
+					foreach(Spielposition::alle_positionen() as $position){
 						$abkuerzung = $position->get_abkuerzung();
 						$bezeichnung = $position->get_bezeichnung();
 						$checked = $this->plays_on_position($position)?'checked':'';
@@ -54,7 +55,7 @@ class Handbase_Handballer{
 	
 	private function load_positionen(){
 		$this->positionen = array();
-		foreach (Handbase_Spielposition::alle_positionen() as $position){
+		foreach (Spielposition::alle_positionen() as $position){
 			if($this->get_meta($position->get_meta_name())){
 				$this->positionen[] = $position;
 			}	
@@ -83,7 +84,7 @@ class Handbase_Handballer{
 	}
 	
 	private function ensure_spielposition($position){
-		if(! ($position instanceof Handbase_Spielposition)){
+		if(! ($position instanceof Spielposition)){
 			ob_start();
 			var_dump($position);
 			throw new Exception("Position ist murks: " + $ob_get_clean());
@@ -96,7 +97,7 @@ class Handbase_Handballer{
 	}
 	
 	private function get_position_from_post(){
-		foreach(Handbase_Spielposition::alle_positionen() as $position){
+		foreach(Spielposition::alle_positionen() as $position){
 			$abkuerzung = $position->get_abkuerzung();
 			$position_field_name = 'position_'.$abkuerzung;
 			$plays_position = $_POST[$position_field_name];
@@ -113,7 +114,7 @@ class Handbase_Handballer{
 	}
 	
 	private function save_positionen(){
-		foreach(Handbase_Spielposition::alle_positionen() as $position){
+		foreach(Spielposition::alle_positionen() as $position){
 			$this->set_meta($position->get_meta_name(), $this->plays_on_position($position));
 		}
 	}
