@@ -20,12 +20,10 @@ class Handbase_Spielposition{
 		return 'Position_'.$this->get_abkuerzung();
 	}
 	
-	public static $TRAINER;
 	public static $TORWART, $LINKS_AUSSEN, $RUECKRAUM_LINKS, $MITTE, $RUECKRAUM_RECHTS, $RECHTS_AUSSEN, $KREIS;
 	
 	public static function alle_positionen(){
 		return array(
-				static::$TRAINER,
 				static::$TORWART,
 				static::$LINKS_AUSSEN,
 				static::$RUECKRAUM_LINKS,
@@ -37,7 +35,6 @@ class Handbase_Spielposition{
 	}
 	
 }
-Handbase_Spielposition::$TRAINER = new Handbase_Spielposition("Trainer", "Tr");
 
 Handbase_Spielposition::$TORWART = new Handbase_Spielposition("Torwart", "TW");
 Handbase_Spielposition::$LINKS_AUSSEN = new Handbase_Spielposition("Links außen", "LA");
