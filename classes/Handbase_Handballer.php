@@ -12,6 +12,39 @@ class Handbase_Handballer{
 		$this->user_id = $user_id;
 	}
 	
+	public function show_profile_extras(){
+		?>
+		<h3>Handballer-Info</h3>
+		<table class="form-table">
+			<?php $this->show_position_checkboxes(); ?>
+		</table>
+		<?php
+	}
+	
+	private function show_position_checkboxes(){
+		?><tr>
+			<th>
+				<label for="position">Positionen</label>
+			</th>
+			<td>
+				<fieldset><?php 
+					foreach(Handbase_Spielposition::alle_positionen() as $position){
+						$abkuerzung = $position->get_abkuerzung();
+						$bezeichnung = $position->get_bezeichnung();
+						$checked = $this->plays_on_position($position)?'checked':'';
+						echo '<label for="'.$abkuerzung.'">';
+						echo '<input type="checkbox" name="position_'.$abkuerzung.'" value="true" id="'.$abkuerzung.'" '.$checked.'>';
+						echo $bezeichnung.' </label>'; 
+					}
+				?></fieldset>
+				<span class="description">
+					Auf welchen Positionen spielst du hauptsächlich?
+				</span>
+			</td>
+		</tr><?php 
+	}
+		
+	
 	public function plays_on_position($position){
 		if(is_null($this->positionen)){
 			$this->load_positionen();
@@ -54,6 +87,24 @@ class Handbase_Handballer{
 			ob_start();
 			var_dump($position);
 			throw new Exception("Position ist murks: " + $ob_get_clean());
+		}
+	}
+	
+	public function save_from_post(){
+		$this->get_position_from_post();
+		$this->save();
+	}
+	
+	private function get_position_from_post(){
+		foreach(Handbase_Spielposition::alle_positionen() as $position){
+			$abkuerzung = $position->get_abkuerzung();
+			$position_field_name = 'position_'.$abkuerzung;
+			$plays_position = $_POST[$position_field_name];
+			if($plays_position){
+				$this->plays_position($position);
+			}else{
+				$this->does_not_play_on_position($position);
+			}
 		}
 	}
 	
