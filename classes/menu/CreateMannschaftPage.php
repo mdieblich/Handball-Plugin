@@ -1,6 +1,6 @@
 <?php
 
-namespace handball;
+namespace handball\menu;
 
 class CreateMannschaftPage{
     /**
@@ -22,7 +22,6 @@ class CreateMannschaftPage{
     public function add_plugin_page(){
     	// TODO Menüs machen 
     	// https://codex.wordpress.org/Adding_Administration_Menus#Top-Level_Menus
-    	echo HANDBASE_IMAGE_DIR.'handball_white.png';
     	    	 
     	add_menu_page( 
     			'Handball - allgemeine Einstellungen', // page_title 

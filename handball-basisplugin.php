@@ -3,7 +3,7 @@
 Plugin Name: Handball-Basisplugin
 Plugin URI: http://dieblich.com/wordpress-handball-base
 Description: Dieses Plugin bietet Basis-Klassen und Attribute für Handball an.
-Version: 0.0.4
+Version: 0.0.5
 Author: Martin Dieblich
 Author URI: http://dieblich.com
 License: GPLv2
@@ -52,7 +52,7 @@ function save_extra_profile_fields( $user_id ) {
 
 
 if( is_admin() ){
-	require_once 'classes/CreateMannschaftPage.php';
-	$my_settings_page = new CreateMannschaftPage();
+	require_once 'classes/menu/CreateMannschaftPage.php';
+	$my_settings_page = new menu\CreateMannschaftPage();
 }
 ?>

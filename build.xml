@@ -7,7 +7,7 @@
 
     <target name="zip">
         <zip destfile="${ant.project.name}.zip">
-        	<fileset dir="." includes="${ant.project.name}.php, uninstall.php, classes/*, images/*" />
+        	<fileset dir="." includes="${ant.project.name}.php, uninstall.php, classes/**, images/**" />
         </zip>
     </target>
 
