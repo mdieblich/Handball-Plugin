@@ -2,7 +2,7 @@
 
 namespace handball\menu;
 
-class CreateMannschaftPage{
+class MySettings{
     /**
      * Holds the values to be used in the fields callbacks
      */
@@ -20,7 +20,6 @@ class CreateMannschaftPage{
      * Add options page
      */
     public function add_plugin_page(){
-    	// TODO Menüs machen 
     	// https://codex.wordpress.org/Adding_Administration_Menus#Top-Level_Menus
     	    	 
     	add_menu_page( 

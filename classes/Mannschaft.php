@@ -3,7 +3,14 @@
 namespace handball;
 require_once 'Handballer.php';
 
+/**
+ * TODO von gemeinsamer DB-Object Klasse ableiten
+ * TODO Datenbank-Schema-Upgrade: https://codex.wordpress.org/Creating_Tables_with_Plugins
+ * 
+ */
 class Mannschaft{
+	
+	private $id;
 	
 	private $meta_info;
 	
@@ -18,6 +25,23 @@ class Mannschaft{
 	/** Hier kann sich jeder selbst eintragen */
 	private $zusatzspieler; // NxM Relation (ein Spieler kann beliebig viele Mannschaften "abonnieren")
 	
+	public function __construct($name, $trainer=null, $cotrainer=null){
+		// TODO Typecheck trainer und cotrainer;
+		$this->meta_info = new Mannschaft_Meta_Info($name);
+		$this->trainer = $trainer;
+		$this->cotrainer = $cotrainer;
+		global $wpdb;
+		$wpdb->insert(
+			static::table_name(),
+			array(
+				'meta_info' => $this->meta_info->get_id(),
+				'trainer' => 0,
+				'cotrainer' => 0
+			)
+		);
+		$this->id = $wpdb->insert_id;
+	}
+	
 	public static function install(){
 
 		global $wpdb;
@@ -29,8 +53,8 @@ class Mannschaft{
 		"CREATE TABLE ".static::table_name()." (
 			  id mediumint(9) NOT NULL AUTO_INCREMENT,
 			  meta_info mediumint(9) NOT NULL,
-			  trainer mediumint(9) NOT NULL,
-			  cotrainer mediumint(9) NOT NULL,
+			  trainer mediumint(9) NULL,
+			  cotrainer mediumint(9) NULL,
 			  UNIQUE KEY id (id)
 			) ".$charset_collate.";";
 		
@@ -58,7 +82,25 @@ class Mannschaft{
 }
 
 class Mannschaft_Meta_Info{
+	
+	private $id;
 	private $name;
+	
+	public function __construct($name){
+		$this->name = $name;
+		global $wpdb;
+		$wpdb->insert(
+			static::table_name(),
+			array(
+				'name' => $this->name
+			)
+		);
+		$this->id = $wpdb->insert_id;
+	}
+	
+	public function get_id(){
+		return $this->id;
+	}
 	
 	public static function install(){
 		global $wpdb;
