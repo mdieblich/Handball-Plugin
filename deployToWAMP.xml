@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE project>
 <project name="handball-basisplugin" basedir="." default="main">
 	
-	<property name="wordpress.dir" value="C:\wamp\www\wp\wp-content"/>
+	<property name="wordpress.dir" value="E:\wamp\www\wp\wp-content"/>
 	<property name="wordpress.plugin" value="${wordpress.dir}\plugins"/>
 	<property name="target.dir" value="${wordpress.plugin}\${ant.project.name}"/>
 

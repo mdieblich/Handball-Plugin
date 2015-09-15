@@ -5,7 +5,7 @@ require_once("Spielposition.php");
 
 class Handballer{
 	
-	private $user_id;
+	private $id;
 	/** Auf welcher Position spielt dieser Spieler? */
 	private $positionen;
 	
@@ -19,7 +19,11 @@ class Handballer{
 	private $zusatzmannschaften;
 	
 	public function __construct($user_id){
-		$this->user_id = $user_id;
+		$this->id = $user_id;
+	}
+	
+	public function get_id(){
+		return $this->id;
 	}
 	
 	public function show_profile_extras(){
@@ -72,7 +76,7 @@ class Handballer{
 	}
 
 	private function get_meta($key){
-		return get_user_meta($this->user_id, $key);
+		return get_user_meta($this->id, $key);
 	}
 	
 	public function plays_position($position){
@@ -105,6 +109,11 @@ class Handballer{
 		$this->save();
 	}
 	
+	public function __toString(){
+		$user = get_userdata($this->id);
+		return $user->first_name.' '.$user->last_name;
+	}
+	
 	private function get_position_from_post(){
 		foreach(Spielposition::alle_positionen() as $position){
 			$abkuerzung = $position->get_abkuerzung();
@@ -129,7 +138,17 @@ class Handballer{
 	}
 	
 	private function set_meta($key, $value){
-		update_usermeta( $this->user_id, $key, $value );
+		update_usermeta( $this->id, $key, $value );
+	}
+	public static $NIEMAND;
+}
+Handballer::$NIEMAND = new Handballer(-1);
+
+function id_to_handballer($user_id){
+	if($user_id == -1){
+		return Handballer::$NIEMAND;
+	}else{
+		return new Handballer($user_id);
 	}
 }
 ?>
