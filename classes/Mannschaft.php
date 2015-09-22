@@ -60,12 +60,99 @@ class Mannschaft {
 		return new Handballer($this->cotrainer);
 	}
 	
+	public function is_stammspieler($user){
+		if(is_null($this->stammspieler)){
+			$this->load_stammspieler();
+		}
+		return in_array($user->ID, $this->stammspieler);
+	}
+	
+	private function load_stammspieler(){
+		global $wpdb;
+		$sql = "SELECT user FROM ". static::table_stammspieler()." WHERE team=$this->id";
+		$this->stammspieler = array();
+		foreach($wpdb->get_results($sql) as $stammspieler_id){
+			$this->stammspieler[] = $stammspieler_id->user;
+		}
+	}
+	
+	public function add_stammspieler($user){
+		if($this->is_stammspieler($user)){
+			return;
+		}
+		global $wpdb;
+		$wpdb->insert(
+				static::table_stammspieler(),
+				array(
+						'team' => $this->id,
+						'user' => $user->ID
+				)
+		);
+		$this->stammspieler[] = $user->ID;
+	}
+	
+	public function is_zusatzspieler($user){
+		if(is_null($this->zusatzspieler)){
+			$this->load_zusatzspieler();
+		}
+		return in_array($user->ID, $this->zusatzspieler);
+	}
+	private function load_zusatzspieler(){
+		global $wpdb;
+		$sql = "SELECT user FROM ". static::table_zusatzspieler()." WHERE team=$this->id";
+		$this->zusatzspieler = array();
+		foreach($wpdb->get_results($sql) as $zusatzspieler_id){
+			$this->zusatzspieler[] = $zusatzspieler_id->user;
+		}
+	}
+	public function add_zusatzspieler($user){
+		if($this->is_zusatzspieler($user)){
+			return;
+		}
+		global $wpdb;
+		$wpdb->insert(
+				static::table_zusatzspieler(),
+				array(
+						'team' => $this->id,
+						'user' => $user->ID
+				)
+		);
+		$this->zusatzspieler[] = $user->ID;
+	}
+
+	public static function add_stammspieler_to_team($team_id, $user_id){
+		global $wpdb;
+		static::remove_zusatzspieler_from_team($team_id, $user_id);
+		
+		$team_user = array(	'team' => $team_id,	'user' => $user_id	);
+		$wpdb->insert(static::table_stammspieler(),	$team_user );
+		return $user_id;
+	}
+	public static function remove_stammspieler_from_team($team_id, $user_id){
+		global $wpdb;
+		$team_user = array(	'team' => $team_id,	'user' => $user_id	);
+		$wpdb->delete(static::table_stammspieler(), $team_user );
+		return $user_id;
+	}
+	public static function add_zusatzspieler_to_team($team_id, $user_id){
+		global $wpdb;
+		static::remove_stammspieler_from_team($team_id, $user_id);
+		$team_user = array(	'team' => $team_id,	'user' => $user_id	);
+		$wpdb->insert(static::table_zusatzspieler(),	$team_user );
+		return $user_id;
+	}
+	public static function remove_zusatzspieler_from_team($team_id, $user_id){
+		global $wpdb;
+		$team_user = array(	'team' => $team_id,	'user' => $user_id	);
+		$wpdb->delete (static::table_zusatzspieler(), $team_user );
+		return $user_id;
+	}
+	
 	public static function install(){
 		global $wpdb;
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	
 		$charset_collate = $wpdb->get_charset_collate();
-	
 		$sql =
 		"CREATE TABLE ".static::table_name()." (
 			  id mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -76,11 +163,32 @@ class Mannschaft {
 		) ".$charset_collate.";";
 	
 		dbDelta( $sql );
+
+		$sql2 =
+		"CREATE TABLE ".static::table_stammspieler()." (
+			  team mediumint(9) NOT NULL,
+			  user mediumint(9) NOT NULL
+		) ".$charset_collate.";";
+		dbDelta( $sql2 );
+		
+		$sql3 =
+		"CREATE TABLE ".static::table_zusatzspieler()."_zusatzspieler (
+			  team mediumint(9) NOT NULL,
+			  user mediumint(9) NOT NULL
+		) ".$charset_collate.";";
+		dbDelta( $sql3 );
 	}
-	
+
 	private static function table_name(){
 		global $wpdb;
 		return $wpdb->prefix . end(explode('\\', get_called_class()));
+	}
+
+	private static function table_stammspieler(){
+		return static::table_name().'_stammspieler';
+	}
+	private static function table_zusatzspieler(){
+		return static::table_name().'_zusatzspieler';
 	}
 	
 	public static function as_id($object){
@@ -91,12 +199,23 @@ class Mannschaft {
 		}
 	}
 	
+	public static function get($id){
+		global $wpdb;
+		$sql = "SELECT * FROM ". static::table_name()." WHERE id=$id";
+		$row = $wpdb->get_row( $sql );
+		return static::to_Mannschaft($row);
+	}
+	
+	private static function to_Mannschaft($object){
+		return new Mannschaft($object->name, $object->trainer, $object->cotrainer, $object->id);
+	}
+	
 	public static function get_all(){
 		global $wpdb;
 		$sql = "SELECT * FROM ". static::table_name();
 		$teams = array();
 		foreach($wpdb->get_results($sql) as $raw_team){
-			$teams[] = new Mannschaft($raw_team->name, $raw_team->trainer, $raw_team->cotrainer, $raw_team->id);
+			$teams[] = static::to_Mannschaft($raw_team);
 		}
 		return $teams;
 	}

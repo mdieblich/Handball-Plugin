@@ -16,7 +16,8 @@ namespace handball;
 
 define( 'HANDBASE_PLUGIN_FILE', __FILE__ );
 define( 'HANDBASE_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
-define( 'HANDBASE_IMAGE_DIR', '../wp-content/plugins/handball-basisplugin/images/');
+define( 'HANDBASE_IMAGE_DIR', '../wp-content/plugins/handball-basisplugin/images');
+define( 'HANDBASE_JAVASCRIPT_DIR', '../wp-content/plugins/handball-basisplugin/javascript');
 
 register_activation_hook( __FILE__, 'handball\activate' );
 register_deactivation_hook( __FILE__, 'handball\deactivate' );
@@ -56,8 +57,11 @@ function save_extra_profile_fields( $user_id ) {
 if( is_admin() ){
 	require_once 'classes/menu/Hauptmenu.php';
 	require_once 'classes/menu/CreateTeamPage.php';
+	require_once 'classes/menu/ManageTeamPage.php';
 	new menu\Hauptmenu();
 	new menu\CreateTeamPage();
+	new menu\ManageTeamPage();
+	// TODO "mein Team"-Seite
 }
 // function my_action_callback() {
 // 	global $wpdb; // this is how you get access to the database

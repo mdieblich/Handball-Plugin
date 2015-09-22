@@ -42,31 +42,31 @@ class CreateTeamPage {
 <script type="text/javascript">
 function setAsTrainer(mannschaftID, nutzerID){
 	var data = {
-	'action': 'set_trainer',
-	'team': mannschaftID,
-	'user': nutzerID
-};
-
-// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
-jQuery.post(ajaxurl, data, function(response) {
-	if(response != nutzerID){
-		alert("Der Trainer konnte nicht richtig gesetzt werden: " + response + " statt " + nutzerID);
-	}
-});
+		'action': 'set_trainer',
+		'team': mannschaftID,
+		'user': nutzerID
+	};
+	
+	// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
+	jQuery.post(ajaxurl, data, function(response) {
+		if(response != nutzerID){
+			alert("Der Trainer konnte nicht richtig gesetzt werden: " + response + " statt " + nutzerID);
+		}
+	});
 }
 function setAsCotrainer(mannschaftID, nutzerID){
 	var data = {
-	'action': 'set_cotrainer',
-	'team': mannschaftID,
-	'user': nutzerID
-};
-
-// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
-jQuery.post(ajaxurl, data, function(response) {
-	if(response != nutzerID){
-		alert("Der Co-Trainer konnte nicht richtig gesetzt werden: " + response + " statt " + nutzerID);
-	}
-});
+		'action': 'set_cotrainer',
+		'team': mannschaftID,
+		'user': nutzerID
+	};
+	
+	// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
+	jQuery.post(ajaxurl, data, function(response) {
+		if(response != nutzerID){
+			alert("Der Co-Trainer konnte nicht richtig gesetzt werden: " + response + " statt " + nutzerID);
+		}
+	});
 }
 			</script>
 <div class="wrap">
@@ -86,8 +86,8 @@ jQuery.post(ajaxurl, data, function(response) {
 			?>
 			        	<tr>
             <td><?php echo $team->get_name(); ?></td>
-            <td><?php echo \handball\input\user_select('Trainer', 'setAsTrainer('.$team->get_id().',this.value)', $team->get_trainer()->get_id()); ?></td>
-            <td><?php echo \handball\input\user_select('Cotrainer','setAsCotrainer('.$team->get_id().',this.value)', $team->get_cotrainer()->get_id()); ?></td>
+            <td><?php echo \handball\input\select_user('Trainer', 'setAsTrainer('.$team->get_id().',this.value)', $team->get_trainer()->get_id()); ?></td>
+            <td><?php echo \handball\input\select_user('Cotrainer','setAsCotrainer('.$team->get_id().',this.value)', $team->get_cotrainer()->get_id()); ?></td>
             <td><a
                 href="admin.php?page=<?php echo static::$MENU_SLUG;?>&delete=<?php echo $team->get_id(); ?>">Löschen</a></td>
         </tr>
@@ -100,10 +100,10 @@ jQuery.post(ajaxurl, data, function(response) {
                     <input type="text" name="Teamname"
                     placeholder="Name"></td>
                 <td>
-	            			<?php echo \handball\input\user_select('Trainer'); ?>
+	            			<?php echo \handball\input\select_user('Trainer'); ?>
 	            		</td>
                 <td>
-	            			<?php echo \handball\input\user_select('Cotrainer'); ?>
+	            			<?php echo \handball\input\select_user('Cotrainer'); ?>
 	            		</td>
                 <td>
 	            			<?php submit_button("Anlegen"); ?>

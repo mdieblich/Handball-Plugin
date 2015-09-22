@@ -7,7 +7,7 @@
 
     <target name="main">
         <copy todir="${target.dir}">
-            <fileset dir="." includes="${ant.project.name}.php, uninstall.php, classes/**, images/**" />
+            <fileset dir="." includes="${ant.project.name}.php, uninstall.php, classes/**, images/**, javascript/**" />
         </copy>
     </target>
 	

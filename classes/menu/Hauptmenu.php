@@ -14,7 +14,7 @@ class Hauptmenu{
 		'manage_options', // capability
 		'handball',  // menu_slug
 		array( $this, 'create_handball_page' ),   // function
-		HANDBASE_IMAGE_DIR.'handball_white.png'   // icon_url
+		HANDBASE_IMAGE_DIR.'/handball_white.png'   // icon_url
 		// position = null
 		);
 	}

@@ -28,7 +28,7 @@ class MySettings{
     			'manage_options', // capability
     			'handball',  // menu_slug
     			array( $this, 'create_admin_page' ),   // function
-    			HANDBASE_IMAGE_DIR.'handball_white.png'   // icon_url 
+    			HANDBASE_IMAGE_DIR.'/handball_white.png'   // icon_url 
     				 // position
     	);
     	
