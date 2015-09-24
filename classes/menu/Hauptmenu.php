@@ -1,6 +1,8 @@
 <?php
 namespace handball\menu;
 
+use handball\Handballer;
+use handball\handball;
 class Hauptmenu{
 
 	public function __construct(){
@@ -20,12 +22,18 @@ class Hauptmenu{
 	}
 	
 	public function create_handball_page(){
+		$current_user = wp_get_current_user();
+		$handballer = new Handballer($current_user->ID);
 		?>
 	        <div class="wrap">
-	            <h2>Handball-Plugin - Einstellungen</h2>
-	            <p>
-	            	Hier gibt es momentan nix zu sehen.
-	            </p>
+	            <h2>Handball</h2>
+				<table class="form-table">
+					<?php 
+					$handballer->show_position_checkboxes(false); 
+					$handballer->list_stammmannschaften(); 
+					$handballer->list_zusatzmannschaften(); 
+					?>
+				</table>
 	        </div>
         <?php
     }

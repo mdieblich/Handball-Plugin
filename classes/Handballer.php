@@ -35,7 +35,7 @@ class Handballer{
 		<?php
 	}
 	
-	private function show_position_checkboxes(){
+	public function show_position_checkboxes($enabled = true){
 		?><tr>
 			<th>
 				<label for="position">Positionen</label>
@@ -46,8 +46,9 @@ class Handballer{
 						$abkuerzung = $position->get_abkuerzung();
 						$bezeichnung = $position->get_bezeichnung();
 						$checked = $this->plays_on_position($position)?'checked':'';
+						$disabled = $enabled ? "":"disabled";
 						echo '<label for="'.$abkuerzung.'">';
-						echo '<input type="checkbox" name="position_'.$abkuerzung.'" value="true" id="'.$abkuerzung.'" '.$checked.'>';
+						echo '<input type="checkbox" name="position_'.$abkuerzung.'" value="true" id="'.$abkuerzung.'" '.$checked.' '.$disabled.'>';
 						echo $bezeichnung.' </label>'; 
 					}
 				?></fieldset>
@@ -141,14 +142,66 @@ class Handballer{
 		update_usermeta( $this->id, $key, $value );
 	}
 	public static $NIEMAND;
+
+	public function get_stammmannschaften(){
+		$teams = array();
+
+		global $wpdb;
+		$sql = "SELECT team FROM ". Mannschaft::table_stammspieler()." WHERE user=$this->id";
+		foreach($wpdb->get_results($sql) as $row){
+			$teams[] = Mannschaft::get($row->team);
+		}
+		
+		return $teams;
+	}
+	public function get_zusatzmannschaften(){
+		$teams = array();
+
+		global $wpdb;
+		$sql = "SELECT team FROM ". Mannschaft::table_zusatzspieler()." WHERE user=$this->id";
+		foreach($wpdb->get_results($sql) as $row){
+			$teams[] = Mannschaft::get($row->team);
+		}
+		
+		return $teams;
+	}
+	public function list_stammmannschaften(){
+		?><tr>
+			<th>
+				<label for="stammmannschaft">Stammmannschaften</label>
+			</th>
+			<td>
+				<?php 
+				foreach ($this->get_stammmannschaften() as $stammmannschaft){
+					echo $stammmannschaft->get_name()."<br>";	
+				}
+				?>
+			</td>
+		</tr><?php 
+	}
+	public function list_zusatzmannschaften(){
+		?><tr>
+			<th>
+				<label for="zusatzmannschaft">Weitere Mannschaften</label>
+			</th>
+			<td>
+				<?php
+				foreach ($this->get_zusatzmannschaften() as $zusatzmannschaft){
+					echo $zusatzmannschaft->get_name()."<br>";
+				}
+				?>
+			</td>
+		</tr><?php 
+	}
+		
 }
 Handballer::$NIEMAND = new Handballer(-1);
 
-function id_to_handballer($user_id){
-	if($user_id == -1){
-		return Handballer::$NIEMAND;
-	}else{
-		return new Handballer($user_id);
+	function id_to_handballer($user_id){
+		if($user_id == -1){
+			return Handballer::$NIEMAND;
+		}else{
+			return new Handballer($user_id);
+		}
 	}
-}
 ?>

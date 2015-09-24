@@ -184,10 +184,10 @@ class Mannschaft {
 		return $wpdb->prefix . end(explode('\\', get_called_class()));
 	}
 
-	private static function table_stammspieler(){
+	public static function table_stammspieler(){
 		return static::table_name().'_stammspieler';
 	}
-	private static function table_zusatzspieler(){
+	public static function table_zusatzspieler(){
 		return static::table_name().'_zusatzspieler';
 	}
 	

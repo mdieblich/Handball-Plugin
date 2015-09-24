@@ -32,7 +32,7 @@ class ManageTeamPage {
 		echo \handball\input\team_select('mannschaft', "window.location.href='admin.php?page=".static::$MENU_SLUG."&mannschaft='+this.value");
 		if(isset($_GET['mannschaft'])){
 			$team = \handball\Mannschaft::get(intval($_GET['mannschaft']));
-			echo "<p>Hallo, Welt!!</p>";
+			echo "<p>Mannschaftsmitglieder verwalten</p>";
 			echo '<script type="text/javascript">';
 			require_once (HANDBASE_JAVASCRIPT_DIR . '/multiselect.min.js');
 			?>
