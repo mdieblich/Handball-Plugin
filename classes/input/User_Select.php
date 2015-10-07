@@ -22,7 +22,12 @@ function select_user($name, $onchange=null, $select=-1){
 	<?php 
 }
 function select_multiple_users($team){
+	wp_enqueue_script('multiselect', plugins_url('/handball-basisplugin/javascript/multiselect.min.js'), array('jquery'));
+	wp_enqueue_script('multiselect-team', plugins_url('/handball-basisplugin/javascript/multiselect-team.js'), array('multiselect'));
 	?>
+	<script type="text/javascript">
+	var teamid=<?php echo $team->get_id(); ?>;
+	</script>
 	<div style="float:left;">
 		Alle Spieler<br>
 		<select name="from[]" id="multiselect" style="width:100%" size="20" multiple="multiple">

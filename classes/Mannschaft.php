@@ -1,14 +1,13 @@
 <?php
 
 namespace handball;
+require_once 'WPDBObject.php';
 require_once 'Handballer.php';
 
 /**
- * TODO von gemeinsamer DB-Object Klasse ableiten
  * TODO Datenbank-Schema-Upgrade: https://codex.wordpress.org/Creating_Tables_with_Plugins
- * 
  */
-class Mannschaft {
+class Mannschaft extends WPDBObject{
 	
 	private $id;
 	
@@ -29,24 +28,16 @@ class Mannschaft {
 		$this->name = $name;
 		$this->trainer = $trainer;
 		$this->cotrainer = $cotrainer;
-		if(-1 === $id){
-			global $wpdb;
-			$wpdb->insert(
-				static::table_name(),
-				array(
-					'name' => $name,
-					'trainer' => static::as_id($this->trainer),
-					'cotrainer' => static::as_id($this->cotrainer)
-				)
-			);
-			$this->id = $wpdb->insert_id;
-		}else{
-			$this->id = $id;
-		}
+		parent::__construct($id);
 	}
 	
-	public function get_id(){
-		return $this->id;
+
+	protected function to_array(){
+		$array = parent::to_array();
+		$array['name'] = $this->name;
+		$array['trainer'] = static::as_id($this->trainer);
+		$array['cotrainer'] = static::as_id($this->cotrainer);
+		return $array;
 	}
 	
 	public function get_name(){
@@ -69,7 +60,7 @@ class Mannschaft {
 	
 	private function load_stammspieler(){
 		global $wpdb;
-		$sql = "SELECT user FROM ". static::table_stammspieler()." WHERE team=$this->id";
+		$sql = "SELECT user FROM ". static::table_stammspieler()." WHERE team=".$this->get_id();
 		$this->stammspieler = array();
 		foreach($wpdb->get_results($sql) as $stammspieler_id){
 			$this->stammspieler[] = $stammspieler_id->user;
@@ -99,7 +90,7 @@ class Mannschaft {
 	}
 	private function load_zusatzspieler(){
 		global $wpdb;
-		$sql = "SELECT user FROM ". static::table_zusatzspieler()." WHERE team=$this->id";
+		$sql = "SELECT user FROM ". static::table_zusatzspieler()." WHERE team=".$this->get_id();
 		$this->zusatzspieler = array();
 		foreach($wpdb->get_results($sql) as $zusatzspieler_id){
 			$this->zusatzspieler[] = $zusatzspieler_id->user;
@@ -179,11 +170,6 @@ class Mannschaft {
 		dbDelta( $sql3 );
 	}
 
-	private static function table_name(){
-		global $wpdb;
-		return $wpdb->prefix . end(explode('\\', get_called_class()));
-	}
-
 	public static function table_stammspieler(){
 		return static::table_name().'_stammspieler';
 	}
@@ -191,41 +177,10 @@ class Mannschaft {
 		return static::table_name().'_zusatzspieler';
 	}
 	
-	public static function as_id($object){
-		if($object instanceof DBObject){
-			return $object->get_id();
-		}else{
-			return $object;
-		}
+	protected static function row_to_object($row_object){
+		return new Mannschaft($row_object->name, $row_object->trainer, $row_object->cotrainer, $row_object->id);
 	}
 	
-	public static function get($id){
-		global $wpdb;
-		$sql = "SELECT * FROM ". static::table_name()." WHERE id=$id";
-		$row = $wpdb->get_row( $sql );
-		return static::to_Mannschaft($row);
-	}
-	
-	private static function to_Mannschaft($object){
-		return new Mannschaft($object->name, $object->trainer, $object->cotrainer, $object->id);
-	}
-	
-	public static function get_all(){
-		global $wpdb;
-		$sql = "SELECT * FROM ". static::table_name();
-		$teams = array();
-		foreach($wpdb->get_results($sql) as $raw_team){
-			$teams[] = static::to_Mannschaft($raw_team);
-		}
-		return $teams;
-	}
-	
-	public static function delete($delete_id){
-		if (is_int ( $delete_id )) {
-			global $wpdb;
-			$wpdb->delete ( static::table_name (), array ('id' => $delete_id ) );
-		}
-	}
 
 	/** Brauchbar als Ajax-Callbackfunction */
 	public static function set_trainer($mannschaft_id, $user_id){
