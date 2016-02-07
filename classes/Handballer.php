@@ -30,7 +30,11 @@ class Handballer{
 		?>
 		<h3>Handballer-Info</h3>
 		<table class="form-table">
-			<?php $this->show_position_checkboxes(); ?>
+			<?php
+				$this->show_position_checkboxes ();
+				$this->list_stammmannschaften ();
+				$this->list_zusatzmannschaften ();
+			?>
 		</table>
 		<?php
 	}

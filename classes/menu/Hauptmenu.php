@@ -27,13 +27,7 @@ class Hauptmenu{
 		?>
 	        <div class="wrap">
 	            <h2>Handball</h2>
-				<table class="form-table">
-					<?php 
-					$handballer->show_position_checkboxes(false); 
-					$handballer->list_stammmannschaften(); 
-					$handballer->list_zusatzmannschaften(); 
-					?>
-				</table>
+                    TODO: Alle Plugin-Daten löschen
 	        </div>
         <?php
     }

@@ -163,7 +163,7 @@ class Mannschaft extends WPDBObject{
 		dbDelta( $sql2 );
 		
 		$sql3 =
-		"CREATE TABLE ".static::table_zusatzspieler()."_zusatzspieler (
+		"CREATE TABLE ".static::table_zusatzspieler()." (
 			  team mediumint(9) NOT NULL,
 			  user mediumint(9) NOT NULL
 		) ".$charset_collate.";";

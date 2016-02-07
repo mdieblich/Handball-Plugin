@@ -29,7 +29,12 @@ add_action( 'edit_user_profile', 'handball\show_extra_profile_fields' );
 
 function activate(){
 	require_once 'classes/Mannschaft.php';
+	require_once 'classes/Halle.php';
+	require_once 'classes/Trainingszeit.php';
+	
 	Mannschaft::install();
+	Halle::install();
+	Trainingszeit::install();
 }
 
 function deactivate(){
@@ -58,7 +63,9 @@ if( is_admin() ){
 	require_once 'classes/menu/Hauptmenu.php';
 	require_once 'classes/menu/CreateTeamPage.php';
 	require_once 'classes/menu/ManageTeamPage.php';
+	require_once 'classes/menu/ManageTrainingTimes.php';
 	new menu\Hauptmenu();
+	new menu\ManageTrainingTimes();
 	new menu\CreateTeamPage();
 	new menu\ManageTeamPage();
 	// TODO "mein Team"-Seite

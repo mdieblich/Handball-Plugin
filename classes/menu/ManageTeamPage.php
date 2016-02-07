@@ -15,8 +15,8 @@ class ManageTeamPage {
 	}
 	public function add_plugin_page() {
 		add_submenu_page ( 'handball', // parent_slug
-		'Mannschaft verwalten', // page_title
-		'Mannschaft verwalten', // menu_title
+		'Mannschaft - Mitglieder verwalten', // page_title
+		'Mannschaft - Mitglieder', // menu_title
 		'manage_options', // capability
 		static::$MENU_SLUG, // menu_slug
 		array (
@@ -36,41 +36,6 @@ class ManageTeamPage {
 			echo "<h3>Mitglieder verwalten</h3>";
 			\handball\input\select_multiple_users($team);
 			
-			echo "<br clear=\"all\" />";
-			echo "<h3>Spiele verwalten</h3>";
-			wp_enqueue_style('fullcalendar', plugins_url('/handball-basisplugin/css/fullcalendar.css'));
-// 			wp_enqueue_style('fullcalendar-print', plugins_url('/handball-basisplugin/css/fullcalendar.print.css'), array('fullcalendar'));
-
-			wp_enqueue_script('moment', plugins_url('/handball-basisplugin/javascript/moment.min.js'));
-			wp_enqueue_script('fullcalendar', plugins_url('/handball-basisplugin/javascript/fullcalendar.min.js'), array('jquery'));
-			wp_enqueue_script('fullcalendar-de', plugins_url('/handball-basisplugin/javascript/fullcalendar-de.js'), array('fullcalendar'));
-			
-			?>
-			
-			<script type="text/javascript">
-
-				// siehe http://fullcalendar.io/docs/
-				jQuery(document).ready(function($) {
-			
-					$('#calendar').fullCalendar({
-						lang: 'de',
-						editable: true,
-						timeFormat: 'H:mm',
-						events: [
-					         {
-								title: 'Training',
-								start: '2015-10-08T19:00:00',
-								end: '2015-10-08T20:30:00'
-					         }
-						]
-					});
-					
-				});
-			
-			</script>
-			
-			<?php 
-			echo '<div id="calendar" style="max-width:900px; margin: 0 auto; float:left"></div>';
 		}
 	}
 	public static function add_stammspieler() {

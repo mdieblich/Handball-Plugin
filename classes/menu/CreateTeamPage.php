@@ -106,7 +106,7 @@ function setAsCotrainer(mannschaftID, nutzerID){
 	            			<?php echo \handball\input\select_user('Cotrainer'); ?>
 	            		</td>
                 <td>
-	            			<?php submit_button("Anlegen"); ?>
+	            			<?php submit_button('Anlegen', 'primary','Anlegen', false); ?>
             			</td>
             </tr>
         </form>

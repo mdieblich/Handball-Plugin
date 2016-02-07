@@ -29,6 +29,9 @@ abstract class WPDBObject{
 		global $wpdb;
 		return $wpdb->prefix . end(explode('\\', get_called_class()));
 	}
+
+	public abstract static function install();
+	public static function uninstall(){}
 	
 	public static function as_id($object){
 		if($object instanceof DBObject){
@@ -46,8 +49,6 @@ abstract class WPDBObject{
 		return static::row_to_object($row);
 	}
 	
-	protected abstract static function row_to_object($row_object);
-	
 	public static function get_all(){
 		global $wpdb;
 		$sql = "SELECT * FROM ". static::table_name();
@@ -64,5 +65,8 @@ abstract class WPDBObject{
 			$wpdb->delete ( static::table_name (), array ('id' => $delete_id ) );
 		}
 	}
+	
+	protected abstract static function row_to_object($row_object);
+	
 }
 ?>
