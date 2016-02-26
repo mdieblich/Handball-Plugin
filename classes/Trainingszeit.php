@@ -48,7 +48,9 @@ class Trainingszeit extends WPDBObject{
 			  uhrzeit char(4) NOT NULL,
 			  dauer tinyint NOT NULL,
 			  hinweis text NULL,
-			  PRIMARY KEY id (id)
+			  PRIMARY KEY id (id),
+ 			  FOREIGN KEY (mannschaft) REFERENCES ".Mannschaft::table_name()."(id),
+ 			  FOREIGN KEY (halle) REFERENCES ".Halle::table_name()."(id),
 		) ".$charset_collate.";";
 	
 		dbDelta( $sql );
