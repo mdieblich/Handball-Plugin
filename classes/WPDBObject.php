@@ -25,7 +25,7 @@ abstract class WPDBObject{
 		return $this->id;
 	}
 	
-	protected static function table_name(){
+	public static function table_name(){
 		global $wpdb;
 		return $wpdb->prefix . end(explode('\\', get_called_class()));
 	}
@@ -67,6 +67,14 @@ abstract class WPDBObject{
 	}
 	
 	protected abstract static function row_to_object($row_object);
+	
+	public function is_in_db(){
+		return $this->id != -1;
+	}
+	
+	public function toJSON(){
+		return json_encode($this->to_array());
+	}
 	
 }
 ?>

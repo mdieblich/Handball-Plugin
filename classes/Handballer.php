@@ -197,6 +197,11 @@ class Handballer{
 			</td>
 		</tr><?php 
 	}
+	
+	public static function table_name(){
+		global $wpdb;
+		return $wpdb->prefix."users";
+	}
 		
 }
 Handballer::$NIEMAND = new Handballer(-1);

@@ -142,15 +142,18 @@ class Mannschaft extends WPDBObject{
 	public static function install(){
 		global $wpdb;
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Handballer.php');
 	
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql =
 		"CREATE TABLE ".static::table_name()." (
 			  id mediumint(9) NOT NULL AUTO_INCREMENT,
 			  name tinytext NOT NULL,
-			  trainer mediumint(9) NULL,
-			  cotrainer mediumint(9) NULL,
-			  PRIMARY KEY id (id)
+			  trainer bigint(20) unsigned NOT NULL,
+			  cotrainer bigint(20) unsigned NOT NULL,
+			  PRIMARY KEY id (id),
+ 			  FOREIGN KEY (trainer) REFERENCES ".Handballer::table_name()."(ID),
+ 			  FOREIGN KEY (cotrainer) REFERENCES ".Handballer::table_name()."(ID)
 		) ".$charset_collate.";";
 	
 		dbDelta( $sql );
@@ -158,14 +161,18 @@ class Mannschaft extends WPDBObject{
 		$sql2 =
 		"CREATE TABLE ".static::table_stammspieler()." (
 			  team mediumint(9) NOT NULL,
-			  user mediumint(9) NOT NULL
+			  user bigint(20) unsigned NOT NULL,
+ 			  FOREIGN KEY (team) REFERENCES ".static::table_name()."(id),
+ 			  FOREIGN KEY (user) REFERENCES ".Handballer::table_name()."(id)
 		) ".$charset_collate.";";
 		dbDelta( $sql2 );
 		
 		$sql3 =
 		"CREATE TABLE ".static::table_zusatzspieler()." (
 			  team mediumint(9) NOT NULL,
-			  user mediumint(9) NOT NULL
+			  user bigint(20) unsigned NOT NULL,
+ 			  FOREIGN KEY (team) REFERENCES ".static::table_name()."(id),
+ 			  FOREIGN KEY (user) REFERENCES ".Handballer::table_name()."(id)
 		) ".$charset_collate.";";
 		dbDelta( $sql3 );
 	}
