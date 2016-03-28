@@ -14,6 +14,7 @@ TODO eigene Capabilities entwerfen (edit_teams...)
 */
 namespace handball;
 
+define( 'HANDBASE_TABLE_PREFIX', 'handbase');
 define( 'HANDBASE_PLUGIN_FILE', __FILE__ );
 define( 'HANDBASE_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
 define( 'HANDBASE_IMAGE_DIR', '../wp-content/plugins/handball-basisplugin/images');
@@ -28,9 +29,12 @@ add_action( 'show_user_profile', 'handball\show_extra_profile_fields' );
 add_action( 'edit_user_profile', 'handball\show_extra_profile_fields' );
 
 function activate(){
+	require_once 'classes/Handballer.php';
 	require_once 'classes/Mannschaft.php';
 	require_once 'classes/Halle.php';
 	require_once 'classes/Trainingszeit.php';
+	
+	Handballer::install();
 	
 	Mannschaft::install();
 	Halle::install();

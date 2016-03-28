@@ -2,12 +2,14 @@
 namespace handball\menu;
 
 use handball\handball;
+use handball\Trainingszeit;
 class ManageTrainingTimes{
 	
 	private static $MENU_SLUG = 'trainingszeiten';
 
 	public function __construct(){
 		add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
+		add_action( 'wp_ajax_add_trainingszeit', 'handball\menu\ManageTrainingTimes::add_trainingszeit' );
 	}
 	
 	public function add_plugin_page(){
@@ -118,32 +120,31 @@ class ManageTrainingTimes{
 		                        
         <script type="text/javascript">
         // siehe http://fullcalendar.io/docs/
-            var clickOnHallenLabelCount = 0;
+        
+            heute1700 = {
+                    title: 'Training',
+                    start: '<?php echo date('Y-m-d');?>T17:00:00',
+                    end: '<?php echo date('Y-m-d');?>T18:30:00'
+            };
+            heute1900 = {
+                    title: 'Training',
+                    start: '<?php echo date('Y-m-d');?>T19:00:00',
+                    end: '<?php echo date('Y-m-d');?>T20:30:00'
+               }
+        
+            var nptHallenzeiten = {
+               events: [heute1700],
+	           color: 'red',
+	           halle: 'NPT'
+	        };
+            var jdsHallenzeiten = {
+               events: [heute1900],
+               color: 'black',
+               halle: 'JDS'
+           };
+        
             jQuery(document).ready(function($) {
                 $('#calendar').fullCalendar({
-
-                    customButtons: {
-                        hallenLabel: {
-                            text: 'Verfügbare Hallen:',
-                            click: function() {
-                                clickOnHallenLabelCount++;
-                                if(clickOnHallenLabelCount > 20){
-                                    message = "";
-                                    for(i=0; i<clickOnHallenLabelCount; i++){
-                                        for(j=0; j<35; j++){
-                                            message += "A";
-                                        }
-                                        message += "\n";
-                                    }
-                                    alert(message);
-                                }else if(clickOnHallenLabelCount == 10){
-                                    alert('Aufhören!!');
-                                }else if(clickOnHallenLabelCount == 5){
-                                    alert('Dieser Knopf hat keine Funktion.\nHör auf ihn zu drücken!');
-                                }
-                            }
-                        }
-                    },
                     header: {
                         left: false,
                         center: false,
@@ -154,59 +155,100 @@ class ManageTrainingTimes{
                     timeFormat: 'H:mm',
                     defaultView: 'agendaWeek',
                     columnFormat: 'ddd',
-                    eventSources:[
-						{
-                            events: [{
-						             title: 'Training',
-						             start: '<?php echo date('Y-m-d');?>T17:00:00',
-						             end: '<?php echo date('Y-m-d');?>T18:30:00'
-						    }],
-                            color: 'red',
-                            halle: 'NPT'
-                        },
-						{
-                            events: [{
-						             title: 'Training',
-						             start: '<?php echo date('Y-m-d');?>T19:00:00',
-						             end: '<?php echo date('Y-m-d');?>T20:30:00'
-						    }],
-                            color: 'black',
-                            halle: 'JDS'
-                        }
-                    ],
+                    eventSources:[ nptHallenzeiten, jdsHallenzeiten ],
                     eventDrop: function(event, delta, revertFunc) {
 
-                        alert(event.title + " ("+event.source.halle+") was dropped on " + event.start.format());
+//                         alert(event.title + " ("+event.source.halle+") was dropped on " + event.start.format());
 
-                        if (!confirm("Are you sure about this change?")) {
-                            revertFunc();
-                        }
+//                         if (!confirm("Are you sure about this change?")) {
+//                             revertFunc();
+//                         }
                     },
                     eventResize: function(event, delta, revertFunc) {
 
-                        alert(event.title + " ("+event.source.halle+") end is now " + event.end.format());
+//                         alert(event.title + " ("+event.source.halle+") end is now " + event.end.format());
 
-                        if (!confirm("is this okay?")) {
-                            revertFunc();
-                        }
+//                         if (!confirm("is this okay?")) {
+//                             revertFunc();
+//                         }
 
                     },
                     eventClick: function(event, jsEvent, view) {
 
-                        alert(event.title + " ("+event.source.halle+") löschen?");
+                        event.title = "CLICKED!";
 
+                        $('#calendar').fullCalendar('updateEvent', event);
 
                     },
                     dayClick: function(date, jsEvent, view) {
 
-                        alert('Clicked on: ' + date.format());
+                        var newTrainingszeit = {
+                                title: 'Neue Zeit',
+                                start: date.format(),
+                                end: date.add(90, 'minutes').format()
+                        }; 
+                        createTraningszeitOnServer(newTrainingszeit, 1, 1, function(success){
+                            if(success){
+                                $('#calendar').fullCalendar('renderEvent', newTrainingszeit, true);
+                            }
+                        });
+//                         var newTrainingszeiten = {
+//                                 events: [newTrainingszeit],
+//                            color: '#22dd00',
+//                            halle: 'JDS'
+//                        };
+//                         $('#calendar').fullCalendar('addEventSource', newTrainingszeiten);
+
+//                         $('#calendar').fullCalendar( 'rerenderEvents' );
+//                      $('#calendar').fullCalendar('removeEventSource', nptHallenzeiten);
+//                      nptHallenzeiten.events.push(newTrainingszeit);
+//                      $('#calendar').fullCalendar('addEventSource', newTrainingszeiten);
 
                     }
                  });
             });
+
+            function createTraningszeitOnServer(trainingszeit, mannschaftID, hallenID, callBackFunction){
+                start = moment(trainingszeit.start);
+                end = moment(trainingszeit.end)
+                var data = {
+                	'action': 'add_trainingszeit',
+                	'team': mannschaftID,
+                    'halle': hallenID,
+                    'weekday': start.format('dddd'),
+                    'time': start.format('h:mm'),
+                    'durationInMin': end.diff(start, 'minutes')
+                };
+                
+                // since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
+                jQuery.post(ajaxurl, data, function(response) {
+                    trainingszeitCreated = JSON.parse(response);
+                    console.log(trainingszeitCreated);
+                	if(trainingszeitCreated == 'undefined'){
+                    	alert("Die Zeit konnte nicht richtig angelegt werden: " + response);
+                    	callBackFunction(false);
+                	}else{
+                        callBackFunction(true);
+                	}
+                });
+            }
+
         </script>
         <div id="calendar" style="max-width:900px; float:left"></div>
+        <button onclick="nextDay()">Klick</button>
         <?php 
+        
+    }
+    public static function add_trainingszeit() {
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
+      	$mannschaft_id = intval ( $_POST ['team'] );
+       	$halle_id = intval ( $_POST ['halle'] );
+       	$weekDay = intval ( $_POST ['weekday'] );
+       	$time = $_POST['time'];
+       	$duration =  intval ( $_POST ['durationInMin'] );
+       	$trainigszeit = new Trainingszeit($mannschaft_id, $halle_id, $weekDay, $time, $duration);
+       	echo $trainigszeit->toJSON();
+       	wp_die ();
     }
 }
 ?>

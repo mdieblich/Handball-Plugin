@@ -26,8 +26,8 @@ class CreateTeamPage {
 
 	}
 	public function create_team_page() {
-		require_once (ABSPATH . 'wp-content/plugins/handball-basisplugin/classes/input/User_Select.php');
-		require_once (ABSPATH . 'wp-content/plugins/handball-basisplugin/classes/Mannschaft.php');
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Mannschaft.php');
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/User_Select.php');
 		
 		if (isset ( $_POST ['createTeam'] )) {
 			$mannschaft = new \handball\Mannschaft ( $_POST ['Teamname'], $_POST ['Trainer'], $_POST ['Cotrainer'] );

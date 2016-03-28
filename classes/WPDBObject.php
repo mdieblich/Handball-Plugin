@@ -27,10 +27,15 @@ abstract class WPDBObject{
 	
 	public static function table_name(){
 		global $wpdb;
-		return $wpdb->prefix . end(explode('\\', get_called_class()));
+		$classname = get_called_class();
+		$splitted_classname = explode('\\', $classname);
+		$last_part_of_classname = end($splitted_classname);
+		return $wpdb->prefix .HANDBASE_TABLE_PREFIX.'_'. $last_part_of_classname;
 	}
 
-	public abstract static function install();
+	public static function install(){
+		// wird von Kindklassen überschrieben
+	}
 	public static function uninstall(){}
 	
 	public static function as_id($object){
@@ -41,7 +46,7 @@ abstract class WPDBObject{
 		}
 	}
 	
-	public static function get($id){
+	public static function get_by_id($id){
 		global $wpdb;
 		$sql = "SELECT * FROM ". static::table_name()." WHERE id=$id";
 		$row = $wpdb->get_row( $sql );
@@ -49,14 +54,18 @@ abstract class WPDBObject{
 		return static::row_to_object($row);
 	}
 	
-	public static function get_all(){
+	public static function get($where){
 		global $wpdb;
-		$sql = "SELECT * FROM ". static::table_name();
+		$sql = 'SELECT * FROM '. static::table_name().' WHERE '.$where;
 		$objects = array();
 		foreach($wpdb->get_results($sql) as $raw_object){
 			$objects[] = static::row_to_object($raw_object);
 		}
 		return $objects;
+	}
+	
+	public static function get_all(){
+		return static::get('1'); // ist das ein get_all?
 	}
 	
 	public static function delete($delete_id){
@@ -66,7 +75,9 @@ abstract class WPDBObject{
 		}
 	}
 	
-	protected abstract static function row_to_object($row_object);
+	protected static function row_to_object($row_object){
+		// wird von Kindklassen überschrieben
+	}
 	
 	public function is_in_db(){
 		return $this->id != -1;

@@ -49,7 +49,7 @@ class Halle extends WPDBObject{
 			  name tinytext NOT NULL,
 			  abkuerzung tinytext NOT NULL,
 			  adresse text NOT NULL,
-			  PRIMARY KEY id (id)
+			  PRIMARY KEY (id)
 		) ".$charset_collate.";";
 	
 		dbDelta( $sql );

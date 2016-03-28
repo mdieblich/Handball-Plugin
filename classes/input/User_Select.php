@@ -1,6 +1,8 @@
 <?php
 namespace handball\input;
 
+use handball\Handballer;
+
 function select_user($name, $onchange=null, $select=-1){
 	$onchange = (is_null($onchange)) ? '': 'onchange="'.$onchange.'"';  
 	?>
@@ -9,6 +11,7 @@ function select_user($name, $onchange=null, $select=-1){
 	<?php 
 		require_once( ABSPATH . 'wp-includes/user.php' );
 		// TODO $all_users cachen oder als Singleton
+		// TODO dies über Handballer::get_all() machen.
 		$all_users = get_users(array(
 				'orderby'      => 'nicename',
 				'order'        => 'ASC'
@@ -39,6 +42,10 @@ function select_multiple_users($team){
 		$stammspieler = array();
 		$zusatzspieler = array();
 		foreach ($all_users as $user){
+			require_once (HANDBASE_PLUGIN_DIR . '/classes/Handballer.php');
+			if($user->ID == Handballer::get_nobody_user_id()){
+				continue;	
+			}
 			if($team->is_stammspieler($user)){
 				$stammspieler[] = $user;
 			}else if($team->is_zusatzspieler($user)){

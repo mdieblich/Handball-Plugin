@@ -104,7 +104,6 @@ class Handballer{
 	private function ensure_spielposition($position){
 		if(! ($position instanceof Spielposition)){
 			ob_start();
-			var_dump($position);
 			throw new Exception("Position ist murks: " + $ob_get_clean());
 		}
 	}
@@ -145,7 +144,6 @@ class Handballer{
 	private function set_meta($key, $value){
 		update_usermeta( $this->id, $key, $value );
 	}
-	public static $NIEMAND;
 
 	public function get_stammmannschaften(){
 		$teams = array();
@@ -153,7 +151,7 @@ class Handballer{
 		global $wpdb;
 		$sql = "SELECT team FROM ". Mannschaft::table_stammspieler()." WHERE user=$this->id";
 		foreach($wpdb->get_results($sql) as $row){
-			$teams[] = Mannschaft::get($row->team);
+			$teams[] = Mannschaft::get_by_id($row->team);
 		}
 		
 		return $teams;
@@ -164,7 +162,7 @@ class Handballer{
 		global $wpdb;
 		$sql = "SELECT team FROM ". Mannschaft::table_zusatzspieler()." WHERE user=$this->id";
 		foreach($wpdb->get_results($sql) as $row){
-			$teams[] = Mannschaft::get($row->team);
+			$teams[] = Mannschaft::get_by_id($row->team);
 		}
 		
 		return $teams;
@@ -202,15 +200,63 @@ class Handballer{
 		global $wpdb;
 		return $wpdb->prefix."users";
 	}
-		
-}
-Handballer::$NIEMAND = new Handballer(-1);
-
-	function id_to_handballer($user_id){
-		if($user_id == -1){
-			return Handballer::$NIEMAND;
+	
+	private static $NOBODY_ID_OPTION = 'handball_nobody_id';
+	private static $NOBODY_NAME = 'Niemand';
+	
+	public static function install(){
+		if(static::nobody_id_option_is_already_set()){
+			require_once( ABSPATH . 'wp-includes/user.php' );
+			$nobodyUsers = get_users( array('include' => static::get_nobody_id_from_options()));
+			if(count($nobodyUsers) == 0){
+				// ID zeigt in's leere
+				static::create_nobody_user();
+			}	
 		}else{
-			return new Handballer($user_id);
+			static::create_nobody_user();
 		}
 	}
+
+	private static function nobody_id_option_is_already_set(){
+		return static::get_nobody_id_from_options() !== false;
+	}
+	private static function get_nobody_id_from_options(){
+		return get_option( static::$NOBODY_ID_OPTION );
+	}
+	
+	private static function create_nobody_user(){
+		$nobody_id;
+		if(static::nobody_user_exists_by_name()){
+			$nobody = get_users( array('search' => static::$NOBODY_NAME))[0];
+			$nobody_id = $nobody->ID;
+		}else{
+			$nobody_id = static::create_nobody_and_get_user_id();
+		}
+		static::set_nobody_id_option($nobody->ID);
+	}
+
+	private static function nobody_user_exists_by_name(){
+		$nobodyUsers = get_users( array('search' => static::$NOBODY_NAME));
+		return count($nobodyUsers)>0;
+	}
+	
+	private static function set_nobody_id_option($id){
+		if(static::nobody_id_option_is_already_set()){
+			update_option( static::$NOBODY_ID_OPTION, $id );
+		}else{
+			$deprecated = null;
+			$autoload = 'no';
+			add_option( static::$NOBODY_ID_OPTION, $id, $deprecated, $autoload );
+		}
+	}
+	private static function create_nobody_and_get_user_id(){
+		$random_password = wp_generate_password( $length=12, $include_standard_special_chars=false );
+		$user_id = wp_create_user( static::$NOBODY_NAME, $random_password);
+		return $user_id;
+	}
+	
+	public static function get_nobody_id(){
+		return static::get_nobody_id_from_options();
+	}
+}
 ?>
