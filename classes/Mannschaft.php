@@ -26,16 +26,8 @@ class Mannschaft extends WPDBObject{
 	
 	public function __construct($name, $trainer = -1, $cotrainer=-1, $id=-1){
 		$this->name = $name;
-		if($trainer==-1){
-			$this->trainer = Handballer::get_nobody_id();	
-		}else{
-			$this->trainer = $trainer;
-		}
-		if($cotrainer==-1){
-			$this->cotrainer = Handballer::get_nobody_id();	
-		}else{
-			$this->cotrainer = $cotrainer;
-		}
+		$this->trainer = $trainer;
+		$this->cotrainer = $cotrainer;
 		parent::__construct($id);
 	}
 	
@@ -183,8 +175,6 @@ class Mannschaft extends WPDBObject{
  			  FOREIGN KEY (user) REFERENCES ".Handballer::table_name()."(id)
 		) ".$charset_collate.";";
 		dbDelta( $sql3 );
-		
-		static::create_no_team();
 	}
 
 	public static function table_stammspieler(){
@@ -213,41 +203,6 @@ class Mannschaft extends WPDBObject{
 		$wpdb->update(static::table_name(), array('cotrainer' => $user_id), array('id' => $mannschaft_id));
 		$row = $wpdb->get_row( 'SELECT cotrainer FROM '.static::table_name().' WHERE id = '.$mannschaft_id );
 		return $row->cotrainer;
-	}
-	
-	private static $NO_TEAM_ID_OPTION = 'handball_no_team_id';
-	private static $NO_TEAM_NAME = 'keine Mannschaft';
-	
-	public static function get_no_team(){
-		if ( static::no_team_id_option_is_already_set() ) {
-			return static::get_by_id(static::get_no_team_id());
-		}else{
-			return static::create_no_team();
-		}
-	}
-	private static function no_team_id_option_is_already_set(){
-		return get_option( static::$NO_TEAM_ID_OPTION ) !== false;
-	}
-	
-	private static function get_no_team_id(){
-		if ( static::no_team_id_option_is_already_set() ) {
-			return get_option(static::$NO_TEAM_ID_OPTION );
-		}else{
-			return static::create_no_team()->get_id();
-		}
-		
-	}
-	
-	private static function create_no_team(){
-		$no_team = new Mannschaft(static::$NO_TEAM_NAME);
-		$deprecated = null;
-		$autoload = 'no';
-		add_option( static::$NO_TEAM_ID_OPTION, $no_team->get_id(), $deprecated, $autoload );
-		return $no_team;
-	}
-	
-	public static function get_all(){
-		return static::get('id!='.static::get_no_team_id());
 	}
 }
 

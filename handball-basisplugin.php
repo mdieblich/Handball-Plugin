@@ -34,8 +34,6 @@ function activate(){
 	require_once 'classes/Halle.php';
 	require_once 'classes/Trainingszeit.php';
 	
-	Handballer::install();
-	
 	Mannschaft::install();
 	Halle::install();
 	Trainingszeit::install();
