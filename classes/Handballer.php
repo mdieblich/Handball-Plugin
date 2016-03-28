@@ -122,9 +122,13 @@ class Handballer{
 		foreach(Spielposition::alle_positionen() as $position){
 			$abkuerzung = $position->get_abkuerzung();
 			$position_field_name = 'position_'.$abkuerzung;
-			$plays_position = $_POST[$position_field_name];
-			if($plays_position){
-				$this->plays_position($position);
+			if(isset($_POST[$position_field_name])){
+				$plays_on_position = $_POST[$position_field_name];
+				if($plays_on_position){
+					$this->plays_position($position);
+				}else{
+					$this->does_not_play_on_position($position);
+				}
 			}else{
 				$this->does_not_play_on_position($position);
 			}
@@ -136,13 +140,21 @@ class Handballer{
 	}
 	
 	private function save_positionen(){
+		var_dump($this->positionen);
 		foreach(Spielposition::alle_positionen() as $position){
-			$this->set_meta($position->get_meta_name(), $this->plays_on_position($position));
+			if($this->plays_on_position($position)){
+				$this->set_meta($position->get_meta_name(), true);
+			}else{
+				$this->delete_meta($position->get_meta_name());
+			}
 		}
 	}
-	
+
 	private function set_meta($key, $value){
-		update_usermeta( $this->id, $key, $value );
+		update_user_meta( $this->id, $key, $value );
+	}
+	private function delete_meta($key){
+		delete_user_meta( $this->id, $key );
 	}
 
 	public function get_stammmannschaften(){
