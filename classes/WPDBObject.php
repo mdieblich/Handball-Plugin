@@ -5,8 +5,8 @@ abstract class WPDBObject{
 	
 	private $id;
 
-	public function __construct($id=-1){
-		if(-1 === $id){
+	public function __construct($id=null){
+		if(is_null($id)){
 			global $wpdb;
 			$parameters = $this->to_array();
 			unset($parameters['id']);
@@ -39,11 +39,14 @@ abstract class WPDBObject{
 	public static function uninstall(){}
 	
 	public static function as_id($object){
-		if($object instanceof DBObject){
+		if(is_null($object)){
+			return null;
+		}if($object instanceof DBObject){
 			return $object->get_id();
-		}else{
+		}else if(is_integer($object)){
 			return $object;
 		}
+		throw new Exception($object.' ist weder null, ein DBObject, noch ein Integer');
 	}
 	
 	public static function get_by_id($id){

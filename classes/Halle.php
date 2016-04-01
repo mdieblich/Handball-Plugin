@@ -8,7 +8,7 @@ class Halle extends WPDBObject{
 	private $abkuerzung;
 	private $adresse;
 	
-	public function __construct($name, $abkuerzung, $adresse, $id=-1){
+	public function __construct($name, $abkuerzung, $adresse, $id=null){
 		$this->name = $name;
 		$this->abkuerzung = $abkuerzung;
 		$this->adresse = $adresse;
@@ -45,7 +45,7 @@ class Halle extends WPDBObject{
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql =
 		"CREATE TABLE ".static::table_name()." (
-			  id mediumint(9) NOT NULL AUTO_INCREMENT,
+			  id mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
 			  name tinytext NOT NULL,
 			  abkuerzung tinytext NOT NULL,
 			  adresse text NOT NULL,

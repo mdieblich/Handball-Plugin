@@ -24,7 +24,7 @@ class Mannschaft extends WPDBObject{
 	/** Hier kann sich jeder selbst eintragen */
 	private $zusatzspieler; // NxM Relation (ein Spieler kann beliebig viele Mannschaften "abonnieren")
 	
-	public function __construct($name, $trainer = -1, $cotrainer=-1, $id=-1){
+	public function __construct($name, $trainer = null, $cotrainer=null, $id=null){
 		$this->name = $name;
 		$this->trainer = $trainer;
 		$this->cotrainer = $cotrainer;
@@ -147,10 +147,10 @@ class Mannschaft extends WPDBObject{
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql =
 		"CREATE TABLE ".static::table_name()." (
-			  id mediumint(9) NOT NULL AUTO_INCREMENT,
+			  id mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
 			  name tinytext NOT NULL,
-			  trainer bigint(20) unsigned NOT NULL,
-			  cotrainer bigint(20) unsigned NOT NULL,
+			  trainer bigint(20) unsigned,
+			  cotrainer bigint(20) unsigned,
 			  PRIMARY KEY (id),
  			  FOREIGN KEY (trainer) REFERENCES ".Handballer::table_name()."(ID),
  			  FOREIGN KEY (cotrainer) REFERENCES ".Handballer::table_name()."(ID)
@@ -160,7 +160,7 @@ class Mannschaft extends WPDBObject{
 
 		$sql2 =
 		"CREATE TABLE ".static::table_stammspieler()." (
-			  team mediumint(9) NOT NULL,
+			  team mediumint(9) unsigned NOT NULL,
 			  user bigint(20) unsigned NOT NULL,
  			  FOREIGN KEY (team) REFERENCES ".static::table_name()."(id),
  			  FOREIGN KEY (user) REFERENCES ".Handballer::table_name()."(id)
@@ -169,7 +169,7 @@ class Mannschaft extends WPDBObject{
 		
 		$sql3 =
 		"CREATE TABLE ".static::table_zusatzspieler()." (
-			  team mediumint(9) NOT NULL,
+			  team mediumint(9) unsigned NOT NULL,
 			  user bigint(20) unsigned NOT NULL,
  			  FOREIGN KEY (team) REFERENCES ".static::table_name()."(id),
  			  FOREIGN KEY (user) REFERENCES ".Handballer::table_name()."(id)
