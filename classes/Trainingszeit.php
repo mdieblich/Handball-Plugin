@@ -13,7 +13,7 @@ class Trainingszeit extends WPDBObject{
 	
 	private $hinweis;
 	
-	public function __construct($mannschaft, $halle, $wochentag, $uhrzeit, $dauer, $hinweis="", $id=-1){
+	public function __construct($wochentag, $uhrzeit, $dauer, $halle=null, $mannschaft=null, $hinweis="", $id=null){
 		$this->mannschaft = $mannschaft;
 		$this->halle = $halle;
 		$this->wochentag = $wochentag;
@@ -42,8 +42,8 @@ class Trainingszeit extends WPDBObject{
 		$sql =
 		"CREATE TABLE ".static::table_name()." (
 			  id mediumint(9) NOT NULL AUTO_INCREMENT,
-			  mannschaft mediumint(9) NOT NULL,
-			  halle mediumint(9) NOT NULL,
+			  mannschaft mediumint(9) unsigned,
+			  halle mediumint(9) unsigned,
 			  wochentag ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'),
 			  uhrzeit char(4) NOT NULL,
 			  dauer tinyint NOT NULL,

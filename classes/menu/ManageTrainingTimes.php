@@ -187,7 +187,7 @@ class ManageTrainingTimes{
                                 start: date.format(),
                                 end: date.add(90, 'minutes').format()
                         }; 
-                        createTraningszeitOnServer(newTrainingszeit, 1, 1, function(success){
+                        createTraningszeitOnServer(newTrainingszeit, -1, -1, function(success){
                             if(success){
                                 $('#calendar').fullCalendar('renderEvent', newTrainingszeit, true);
                             }
@@ -246,7 +246,7 @@ class ManageTrainingTimes{
        	$weekDay = intval ( $_POST ['weekday'] );
        	$time = $_POST['time'];
        	$duration =  intval ( $_POST ['durationInMin'] );
-       	$trainigszeit = new Trainingszeit($mannschaft_id, $halle_id, $weekDay, $time, $duration);
+       	$trainigszeit = new Trainingszeit($weekDay, $time, $duration, $halle_id, $mannschaft_id);
        	echo $trainigszeit->toJSON();
        	wp_die ();
     }
