@@ -9,6 +9,7 @@ class Halle extends WPDBObject{
 	private $adresse;
 	
 	public function __construct($name, $abkuerzung, $adresse, $id=null){
+		// TODO SQLInjection abfangen 
 		$this->name = $name;
 		$this->abkuerzung = $abkuerzung;
 		$this->adresse = $adresse;

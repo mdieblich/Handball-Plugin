@@ -19,6 +19,11 @@ class Handballer{
 	private $zusatzmannschaften;
 	
 	public function __construct($user_id){
+		if(!is_int($user_id)){
+			throw new \Exception($user_id.' ist kein Integer.');
+		}else if($user_id<0){
+			throw new \Exception($user_id.' ist negativ');
+		}
 		$this->id = $user_id;
 	}
 	
@@ -40,6 +45,9 @@ class Handballer{
 	}
 	
 	public function show_position_checkboxes($enabled = true){
+		if(!is_bool($enabled)){
+			throw new \Exception($enabled.' ist kein boolescher Wert');	
+		}
 		?><tr>
 			<th>
 				<label for="position">Positionen</label>
@@ -85,6 +93,9 @@ class Handballer{
 	}
 	
 	public function plays_position($position){
+		if(! ($position instanceof Spielposition) ){
+			throw new \Exception($position.' ist keine Spielposition');	
+		}
 		$this->ensure_spielposition($position);
 		if(!$this->plays_on_position($position)){
 			$this->positionen[] = $position;
@@ -92,6 +103,9 @@ class Handballer{
 	}
 	
 	public function does_not_play_on_position($position){
+		if(! ($position instanceof Spielposition) ){
+			throw new \Exception($position.' ist keine Spielposition');	
+		}
 		$this->ensure_spielposition($position);
 		if(is_null($this->positionen)){
 			$this->load_positionen();
@@ -211,6 +225,32 @@ class Handballer{
 	public static function table_name(){
 		global $wpdb;
 		return $wpdb->prefix."users";
+	}
+	
+	public static function ensure_handballer($handballer){
+		if(is_null($handballer)){
+			return $handballer;
+		}
+		if(is_int($handballer)){
+			return $handballer;
+		}
+		if($handballer instanceof Handballer){
+			return $handballer;
+		}
+		throw new \Exception($handballer.' ist weder null, noch eine id, noch ein Handballer');
+	}
+	
+	public static function as_id_or_null($handballer){
+		if(is_null($handballer)){
+			return null;
+		}
+		if(is_int($handballer)){
+			return $handballer;
+		}
+		if($handballer instanceof Handballer){
+			return $handballer->id;
+		}
+		throw new \Exception($handballer.' ist weder eine id, noch ein Handballer');
 	}
 }
 ?>

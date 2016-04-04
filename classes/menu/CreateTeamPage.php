@@ -30,7 +30,7 @@ class CreateTeamPage {
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/User_Select.php');
 		
 		if (isset ( $_POST ['createTeam'] )) {
-			$mannschaft = new \handball\Mannschaft ( $_POST ['Teamname'], $_POST ['Trainer'], $_POST ['Cotrainer'] );
+			$mannschaft = new \handball\Mannschaft ( $_POST ['Teamname'], intval($_POST ['Trainer']), intval($_POST ['Cotrainer']) );
 		}
 		
 		if (isset ( $_GET ['delete'] )) {

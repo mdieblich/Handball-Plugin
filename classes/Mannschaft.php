@@ -26,17 +26,16 @@ class Mannschaft extends WPDBObject{
 	
 	public function __construct($name, $trainer = null, $cotrainer=null, $id=null){
 		$this->name = $name;
-		$this->trainer = $trainer;
-		$this->cotrainer = $cotrainer;
+		$this->trainer = Handballer::ensure_handballer($trainer);
+		$this->cotrainer = Handballer::ensure_handballer($cotrainer);
 		parent::__construct($id);
 	}
-	
 
 	protected function to_array(){
 		$array = parent::to_array();
 		$array['name'] = $this->name;
-		$array['trainer'] = static::as_id($this->trainer);
-		$array['cotrainer'] = static::as_id($this->cotrainer);
+		$array['trainer'] = Handballer::as_id_or_null($this->trainer);
+		$array['cotrainer'] = Handballer::as_id_or_null($this->cotrainer);
 		return $array;
 	}
 	
@@ -68,6 +67,9 @@ class Mannschaft extends WPDBObject{
 	}
 	
 	public function add_stammspieler($user){
+		if(is_null($user)){
+			throw new Exception('Stammspieler ist null');
+		}
 		if($this->is_stammspieler($user)){
 			return;
 		}

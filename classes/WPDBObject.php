@@ -46,7 +46,7 @@ abstract class WPDBObject{
 		}else if(is_integer($object)){
 			return $object;
 		}
-		throw new Exception($object.' ist weder null, ein DBObject, noch ein Integer');
+		throw new \Exception($object.' ist weder null, ein DBObject, noch ein Integer');
 	}
 	
 	public static function get_by_id($id){
