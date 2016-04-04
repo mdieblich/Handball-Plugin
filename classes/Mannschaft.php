@@ -187,7 +187,12 @@ class Mannschaft extends WPDBObject{
 	}
 	
 	protected static function row_to_object($row_object){
-		return new Mannschaft($row_object->name, $row_object->trainer, $row_object->cotrainer, $row_object->id);
+		return new Mannschaft(
+				$row_object->name, 
+				intval($row_object->trainer), 
+				intval($row_object->cotrainer), 
+				intval($row_object->id)
+		);
 	}
 	
 
