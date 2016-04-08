@@ -45,7 +45,7 @@ class Trainingszeit extends WPDBObject{
 			  mannschaft mediumint(9) unsigned,
 			  halle mediumint(9) unsigned,
 			  wochentag ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'),
-			  uhrzeit char(4) NOT NULL,
+			  uhrzeit char(5) NOT NULL,
 			  dauer tinyint NOT NULL,
 			  hinweis text NULL,
 			  PRIMARY KEY (id),
@@ -57,13 +57,54 @@ class Trainingszeit extends WPDBObject{
 	}
 	protected static function row_to_object($row_object){
 		return new Trainingszeit(
-				$row_object->mannschaft, 
-				$row_object->halle, 
 				$row_object->wochentag, 
 				$row_object->uhrzeit, 
 				$row_object->dauer, 
+				$row_object->halle, 
+				$row_object->mannschaft, 
 				$row_object->hinweis, 
 				$row_object->id);
+	}
+	
+	public static function get_fullcalender_io_events($trainingszeiten){
+		if(!is_array($trainingszeiten)){
+			throw new \Exception('Trainingszeiten ist kein array: '.$trainingszeiten);
+		}
+		$fullcalendar_io_events = array();
+		foreach($trainingszeiten as $trainingszeit){
+			if(!($trainingszeit instanceof Trainingszeit)){
+				throw new \Exception('Element ('.$trainingszeit.') im Array ist keine Trainingszeit');
+			}
+			$fullcalendar_io_events[] = $trainingszeit->to_fullcalendar_io_event();
+		}
+		return $fullcalendar_io_events;
+	}
+	
+	private function to_fullcalendar_io_event(){
+		return 
+			"{\n"
+				."title: 'Training',\n"
+				.'start: \''.$this->get_start_in_current_week()."',\n"
+				.'end: \''.$this->get_end_in_current_week()."'\n"
+			.'}';
+	}
+		
+	private function get_start_in_current_week(){
+		return date('Y-m-d', $this->get_day_in_current_week()).'T'.date('H:i', strtotime($this->uhrzeit)).':00';
+	}
+	
+	private function get_day_in_current_week(){
+		$weekday = date('w', strtotime($this->wochentag));
+		$currentWeekDay = date('w');
+		return strtotime(($weekday-$currentWeekDay).' day');
+	}
+	private function get_end_in_current_week(){
+		return date('Y-m-d', $this->get_day_in_current_week()).'T'.$this->get_endzeit().':00';
+	}
+	private function get_endzeit(){
+		$startzeit = strtotime($this->uhrzeit);
+		$endzeit = strtotime($this->dauer.' min', $startzeit);
+		return date('H:i', $endzeit);
 	}
 }
 ?>

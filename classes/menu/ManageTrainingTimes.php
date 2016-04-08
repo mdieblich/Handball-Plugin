@@ -121,6 +121,8 @@ class ManageTrainingTimes{
         <script type="text/javascript">
         // siehe http://fullcalendar.io/docs/
         
+        	var unassignedColor = 'red';
+        
             heute1700 = {
                     title: 'Training',
                     start: '<?php echo date('Y-m-d');?>T17:00:00',
@@ -131,7 +133,22 @@ class ManageTrainingTimes{
                     start: '<?php echo date('Y-m-d');?>T19:00:00',
                     end: '<?php echo date('Y-m-d');?>T20:30:00'
                }
-        
+
+	
+            var unassignedHallenzeiten = {
+				color: unassignedColor,
+				events:
+					[
+					<?php 
+					require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
+					$unassignedTrainingTimes = Trainingszeit::get('halle is null');
+					echo '// '.count($unassignedTrainingTimes)."\n";
+					$fullcalender_events = Trainingszeit::get_fullcalender_io_events($unassignedTrainingTimes);
+					echo implode(", \n", $fullcalender_events);
+					?>
+					]
+            };
+      
             var nptHallenzeiten = {
                events: [heute1700],
 	           color: 'red',
@@ -155,7 +172,7 @@ class ManageTrainingTimes{
                     timeFormat: 'H:mm',
                     defaultView: 'agendaWeek',
                     columnFormat: 'ddd',
-                    eventSources:[ nptHallenzeiten, jdsHallenzeiten ],
+                    eventSources:[ unassignedHallenzeiten, nptHallenzeiten, jdsHallenzeiten ],
                     eventDrop: function(event, delta, revertFunc) {
 
 //                         alert(event.title + " ("+event.source.halle+") was dropped on " + event.start.format());
@@ -183,11 +200,12 @@ class ManageTrainingTimes{
                     dayClick: function(date, jsEvent, view) {
 
                         var newTrainingszeit = {
-                                title: 'Neue Zeit',
+                                color: unassignedColor,
+                                title: 'Training',
                                 start: date.format(),
                                 end: date.add(90, 'minutes').format()
                         }; 
-                        createTraningszeitOnServer(newTrainingszeit, -1, -1, function(success){
+                        createTraningszeitOnServer(newTrainingszeit, function(success){
                             if(success){
                                 $('#calendar').fullCalendar('renderEvent', newTrainingszeit, true);
                             }
@@ -208,28 +226,20 @@ class ManageTrainingTimes{
                  });
             });
 
-            function createTraningszeitOnServer(trainingszeit, mannschaftID, hallenID, callBackFunction){
+            function createTraningszeitOnServer(trainingszeit, callBackFunction){
                 start = moment(trainingszeit.start);
-                end = moment(trainingszeit.end)
+                end = moment(trainingszeit.end);
                 var data = {
                 	'action': 'add_trainingszeit',
-                	'team': mannschaftID,
-                    'halle': hallenID,
-                    'weekday': start.format('dddd'),
-                    'time': start.format('h:mm'),
+                    'weekday': start.locale('en').format('dddd'),
+                    'time': start.format('H:mm'),
                     'durationInMin': end.diff(start, 'minutes')
                 };
                 
                 // since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
                 jQuery.post(ajaxurl, data, function(response) {
                     trainingszeitCreated = JSON.parse(response);
-                    console.log(trainingszeitCreated);
-                	if(trainingszeitCreated == 'undefined'){
-                    	alert("Die Zeit konnte nicht richtig angelegt werden: " + response);
-                    	callBackFunction(false);
-                	}else{
-                        callBackFunction(true);
-                	}
+                    callBackFunction(trainingszeitCreated != 'undefined');
                 });
             }
 
@@ -241,12 +251,10 @@ class ManageTrainingTimes{
     }
     public static function add_trainingszeit() {
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
-      	$mannschaft_id = intval ( $_POST ['team'] );
-       	$halle_id = intval ( $_POST ['halle'] );
-       	$weekDay = intval ( $_POST ['weekday'] );
+       	$weekDay = $_POST ['weekday'];
        	$time = $_POST['time'];
        	$duration =  intval ( $_POST ['durationInMin'] );
-       	$trainigszeit = new Trainingszeit($weekDay, $time, $duration, $halle_id, $mannschaft_id);
+       	$trainigszeit = new Trainingszeit($weekDay, $time, $duration);
        	echo $trainigszeit->toJSON();
        	wp_die ();
     }

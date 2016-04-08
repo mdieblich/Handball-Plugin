@@ -59,5 +59,9 @@ class Halle extends WPDBObject{
 	protected static function row_to_object($row_object){
 		return new Halle($row_object->name, $row_object->abkuerzung, $row_object->adresse, $row_object->id);
 	}
+	
+	public function get_trainingszeiten_as_fullcalendar_io_event_source(){
+		
+	}
 }
 ?>
