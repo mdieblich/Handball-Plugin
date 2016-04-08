@@ -83,6 +83,7 @@ class Trainingszeit extends WPDBObject{
 	private function to_fullcalendar_io_event(){
 		return 
 			"{\n"
+				."id: ".$this->get_id().",\n"
 				."title: 'Training',\n"
 				.'start: \''.$this->get_start_in_current_week()."',\n"
 				.'end: \''.$this->get_end_in_current_week()."'\n"

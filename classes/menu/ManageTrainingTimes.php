@@ -200,33 +200,23 @@ class ManageTrainingTimes{
                     dayClick: function(date, jsEvent, view) {
 
                         var newTrainingszeit = {
-                                color: unassignedColor,
                                 title: 'Training',
                                 start: date.format(),
                                 end: date.add(90, 'minutes').format()
-                        }; 
-                        createTraningszeitOnServer(newTrainingszeit, function(success){
-                            if(success){
-                                $('#calendar').fullCalendar('renderEvent', newTrainingszeit, true);
-                            }
-                        });
-//                         var newTrainingszeiten = {
-//                                 events: [newTrainingszeit],
-//                            color: '#22dd00',
-//                            halle: 'JDS'
-//                        };
-//                         $('#calendar').fullCalendar('addEventSource', newTrainingszeiten);
+                        };
+                        createTraningszeitOnServer(newTrainingszeit, function(createdId){
+                            $('#calendar').fullCalendar('removeEventSource', unassignedHallenzeiten);
+                            newTrainingszeit.id = createdId;
+                            unassignedHallenzeiten.events.push(newTrainingszeit);
+                            $('#calendar').fullCalendar('addEventSource', unassignedHallenzeiten);
 
-//                         $('#calendar').fullCalendar( 'rerenderEvents' );
-//                      $('#calendar').fullCalendar('removeEventSource', nptHallenzeiten);
-//                      nptHallenzeiten.events.push(newTrainingszeit);
-//                      $('#calendar').fullCalendar('addEventSource', newTrainingszeiten);
+                        });
 
                     }
                  });
             });
 
-            function createTraningszeitOnServer(trainingszeit, callBackFunction){
+            function createTraningszeitOnServer(trainingszeit, callBackFunctionOnSuccess){
                 start = moment(trainingszeit.start);
                 end = moment(trainingszeit.end);
                 var data = {
@@ -239,7 +229,11 @@ class ManageTrainingTimes{
                 // since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
                 jQuery.post(ajaxurl, data, function(response) {
                     trainingszeitCreated = JSON.parse(response);
-                    callBackFunction(trainingszeitCreated != 'undefined');
+                    if(trainingszeitCreated != 'undefined'){
+                    	callBackFunctionOnSuccess(trainingszeitCreated.id);
+                    }else{
+						alert("Die Trainingszeit konnte nicht angelegt werden:\n"+response);
+                    }
                 });
             }
 
