@@ -10,6 +10,7 @@ class ManageTrainingTimes{
 	public function __construct(){
 		add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
 		add_action( 'wp_ajax_add_trainingszeit', 'handball\menu\ManageTrainingTimes::add_trainingszeit' );
+		add_action( 'wp_ajax_change_start', 'handball\menu\ManageTrainingTimes::change_start' );
 	}
 	
 	public function add_plugin_page(){
@@ -175,11 +176,15 @@ class ManageTrainingTimes{
                     eventSources:[ unassignedHallenzeiten, nptHallenzeiten, jdsHallenzeiten ],
                     eventDrop: function(event, delta, revertFunc) {
 
-//                         alert(event.title + " ("+event.source.halle+") was dropped on " + event.start.format());
-
-//                         if (!confirm("Are you sure about this change?")) {
-//                             revertFunc();
-//                         }
+//                      if (!confirm("Are you sure about this change?")) {
+//                          revertFunc();
+//                      }
+                    	callBackFunctionOnSuccess = null;
+                    	callBackFunctionOnFailure = function(response){
+							alert(response);
+							revertFunc();
+                    	}
+                    	changeStart(event, callBackFunctionOnSuccess, callBackFunctionOnFailure);
                     },
                     eventResize: function(event, delta, revertFunc) {
 
@@ -203,7 +208,7 @@ class ManageTrainingTimes{
                                 title: 'Training',
                                 start: date.format(),
                                 end: date.add(90, 'minutes').format()
-                        };
+                        }; 
                         createTraningszeitOnServer(newTrainingszeit, function(createdId){
                             $('#calendar').fullCalendar('removeEventSource', unassignedHallenzeiten);
                             newTrainingszeit.id = createdId;
@@ -216,23 +221,52 @@ class ManageTrainingTimes{
                  });
             });
 
-            function createTraningszeitOnServer(trainingszeit, callBackFunctionOnSuccess){
-                start = moment(trainingszeit.start);
-                end = moment(trainingszeit.end);
-                var data = {
-                	'action': 'add_trainingszeit',
-                    'weekday': start.locale('en').format('dddd'),
-                    'time': start.format('H:mm'),
-                    'durationInMin': end.diff(start, 'minutes')
-                };
+            function createTraningszeitOnServer(trainingszeit, trainingszeitWasCreated){
+                var data = eventToAJAXData(trainingszeit);
+                data['action'] = 'add_trainingszeit';
                 
                 // since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
                 jQuery.post(ajaxurl, data, function(response) {
                     trainingszeitCreated = JSON.parse(response);
-                    if(trainingszeitCreated != 'undefined'){
-                    	callBackFunctionOnSuccess(trainingszeitCreated.id);
+                    if(trainingszeitCreated != 'undefined' && trainingszeitWasCreated){
+                    	trainingszeitWasCreated(trainingszeitCreated.id);
                     }else{
 						alert("Die Trainingszeit konnte nicht angelegt werden:\n"+response);
+                    }
+                });
+            }
+
+			function eventToAJAXData(event){
+                start = moment(event.start);
+                end = moment(event.end);
+                var data = {
+                    'weekday': start.locale('en').format('dddd'),
+                    'time': start.format('H:mm'),
+                    'durationInMin': end.diff(start, 'minutes')
+                };
+                return data;
+			}
+            
+
+            function changeStart(trainingszeit, trainingszeitWasUpdated, callBackFunctionOnFailure){
+                start = moment(trainingszeit.start);
+                var data = {
+                	'action': 'change_start',
+					'id': trainingszeit.id,
+					'time': start.format('H:mm'),
+                    'weekday': start.locale('en').format('dddd')
+                }
+                jQuery.post(ajaxurl, data, function(response) {
+                    console.log(response);
+                    trainingszeitCreated = JSON.parse(response);
+                    if(trainingszeitCreated != 'undefined'){
+                        if(trainingszeitWasUpdated){
+                    		trainingszeitWasUpdated(trainingszeitCreated);
+                        }
+                    }else{
+                        if(callBackFunctionOnFailure){
+                        	callBackFunctionOnFailure(response);
+                        }
                     }
                 });
             }
@@ -250,6 +284,28 @@ class ManageTrainingTimes{
        	$duration =  intval ( $_POST ['durationInMin'] );
        	$trainigszeit = new Trainingszeit($weekDay, $time, $duration);
        	echo $trainigszeit->toJSON();
+       	wp_die ();
+    }
+    public static function change_start() {
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
+       	$id = intval($_POST ['id']);
+       	$time = $_POST['time'];
+       	$weekDay = $_POST ['weekday'];
+       	
+       	$trainigszeit = Trainingszeit::get_by_id($id);
+       	if(is_null($trainigszeit)){
+       		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
+       		wp_die();
+       	}
+       	$trainigszeit->set_uhrzeit($time);
+       	$trainigszeit->set_wochentag($weekDay);
+       	if($trainigszeit->save()){
+       		echo $trainigszeit->toJSON();
+       	}else{
+       		global $wpdb;
+       		echo "Fehler beim Speichern der neuen Startzeit:\n";
+       		$wpdb->print_error();
+       	}
        	wp_die ();
     }
 }

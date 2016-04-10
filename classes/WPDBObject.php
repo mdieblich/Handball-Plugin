@@ -8,17 +8,23 @@ abstract class WPDBObject{
 	public function __construct($id=null){
 		if(is_null($id)){
 			global $wpdb;
-			$parameters = $this->to_array();
-			unset($parameters['id']);
-			$wpdb->insert( static::table_name(), $parameters	);
+			$wpdb->insert( static::table_name(), $this->to_array_without_id()	);
 			$this->id = $wpdb->insert_id;
+		}else if(is_numeric($id)){
+			$this->id = intval($id);
 		}else{
-			$this->id = $id;
+			throw new \Exception('Die ID ist kein Integer oder null: '.$id);
 		}
 	}
 	
 	protected function to_array(){
 		return array('id' => $this->id);
+	}
+	
+	private function to_array_without_id(){
+		$array = $this->to_array();
+		unset($array['id']);
+		return $array;
 	}
 	
 	public function get_id(){
@@ -40,7 +46,7 @@ abstract class WPDBObject{
 	
 	public static function as_id($object){
 		if(is_null($object)){
-			return null;
+			return null; // vorher stand hier null
 		}if($object instanceof DBObject){
 			return $object->get_id();
 		}else if(is_integer($object)){
@@ -88,6 +94,18 @@ abstract class WPDBObject{
 	
 	public function toJSON(){
 		return json_encode($this->to_array());
+	}
+	
+	public function save(){
+		if(is_null($this->id)){
+			throw new \Exception('ID ist null für '.$this);
+		}
+		global $wpdb;
+		return false !== $wpdb->update(
+				static::table_name(), 
+				$this->to_array_without_id(), 
+				array('id' => intval($this->id)));
+		
 	}
 	
 }

@@ -86,7 +86,9 @@ class Trainingszeit extends WPDBObject{
 				."id: ".$this->get_id().",\n"
 				."title: 'Training',\n"
 				.'start: \''.$this->get_start_in_current_week()."',\n"
-				.'end: \''.$this->get_end_in_current_week()."'\n"
+				.'end: \''.$this->get_end_in_current_week()."',\n"
+				.'halle: \''.$this->halle."',\n"
+				.'mannschaft: \''.$this->mannschaft."'\n"
 			.'}';
 	}
 		
@@ -96,7 +98,9 @@ class Trainingszeit extends WPDBObject{
 	
 	private function get_day_in_current_week(){
 		$weekday = date('w', strtotime($this->wochentag));
+		if($weekday == 0){ $weekday=7;}
 		$currentWeekDay = date('w');
+		if($currentWeekDay == 0){ $currentWeekDay=7;}
 		return strtotime(($weekday-$currentWeekDay).' day');
 	}
 	private function get_end_in_current_week(){
@@ -106,6 +110,13 @@ class Trainingszeit extends WPDBObject{
 		$startzeit = strtotime($this->uhrzeit);
 		$endzeit = strtotime($this->dauer.' min', $startzeit);
 		return date('H:i', $endzeit);
+	}
+
+	public function set_uhrzeit($uhrzeit){
+		$this->uhrzeit = $uhrzeit;
+	}
+	public function set_wochentag($wochentag){
+		$this->wochentag = $wochentag;
 	}
 }
 ?>
