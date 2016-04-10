@@ -124,6 +124,9 @@ class ManageTrainingTimes{
         // siehe http://fullcalendar.io/docs/
         
         	var unassignedColor = 'red';
+        	var selectedEvent = null;
+        	var originalColorOfSelectedEvent = '';
+        	var originalTextColorOfSelectedEvent = '';
         
             heute1700 = {
                     title: 'Training',
@@ -212,7 +215,16 @@ class ManageTrainingTimes{
                     },
                     eventClick: function(event, jsEvent, view) {
 
-                        event.title = "CLICKED!";
+                    	if(selectedEvent){
+                    		selectedEvent.color = originalColorOfSelectedEvent;
+                    		selectedEvent.textColor = originalTextColorOfSelectedEvent;
+                            $('#calendar').fullCalendar('updateEvent', selectedEvent);
+                    	}
+                    	originalColorOfSelectedEvent = event.color;
+                    	originalTextColorOfSelectedEvent = event.textColor;
+                        event.color = 'white';
+                        event.textColor = 	'black';
+                    	selectedEvent = event;
 
                         $('#calendar').fullCalendar('updateEvent', event);
 
