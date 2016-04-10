@@ -169,12 +169,20 @@ class ManageTrainingTimes{
                         center: false,
                         right: false
                     },
+                    height: 500,
                     lang: 'de',
                     editable: true,
                     timeFormat: 'H:mm',
                     defaultView: 'agendaWeek',
                     columnFormat: 'ddd',
+                    scrollTime: '16:00',
                     snapDuration: '00:15',
+                    allDaySlot: false,
+//                     businessHours: {
+//                     	start: '15:00', 
+//                         end: '22:00',
+//                         dow: [ 1, 2, 3, 4, 5]
+//                     },
                     eventSources:[ unassignedHallenzeiten, nptHallenzeiten, jdsHallenzeiten ],
                     eventDrop: function(event, delta, revertFunc) {
 
