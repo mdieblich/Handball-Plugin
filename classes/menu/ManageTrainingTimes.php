@@ -11,6 +11,7 @@ class ManageTrainingTimes{
 		add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
 		add_action( 'wp_ajax_add_trainingszeit', 'handball\menu\ManageTrainingTimes::add_trainingszeit' );
 		add_action( 'wp_ajax_change_start', 'handball\menu\ManageTrainingTimes::change_start' );
+		add_action( 'wp_ajax_change_duration', 'handball\menu\ManageTrainingTimes::change_duration' );
 	}
 	
 	public function add_plugin_page(){
@@ -188,11 +189,16 @@ class ManageTrainingTimes{
                     },
                     eventResize: function(event, delta, revertFunc) {
 
-//                         alert(event.title + " ("+event.source.halle+") end is now " + event.end.format());
+//                      if (!confirm("Are you sure about this change?")) {
+//                          revertFunc();
+//                      }
 
-//                         if (!confirm("is this okay?")) {
-//                             revertFunc();
-//                         }
+                    	callBackFunctionOnSuccess = null;
+                    	callBackFunctionOnFailure = function(response){
+							alert(response);
+							revertFunc();
+                    	}
+                    	changeDuration(event, callBackFunctionOnSuccess, callBackFunctionOnFailure);
 
                     },
                     eventClick: function(event, jsEvent, view) {
@@ -242,13 +248,13 @@ class ManageTrainingTimes{
                 var data = {
                     'weekday': start.locale('en').format('dddd'),
                     'time': start.format('H:mm'),
-                    'durationInMin': end.diff(start, 'minutes')
+                    'duration': end.diff(start, 'minutes')
                 };
                 return data;
 			}
             
 
-            function changeStart(trainingszeit, trainingszeitWasUpdated, callBackFunctionOnFailure){
+            function changeStart(trainingszeit, callBackFunctionOnSuccess, callBackFunctionOnFailure){
                 start = moment(trainingszeit.start);
                 var data = {
                 	'action': 'change_start',
@@ -260,8 +266,30 @@ class ManageTrainingTimes{
                     console.log(response);
                     trainingszeitCreated = JSON.parse(response);
                     if(trainingszeitCreated != 'undefined'){
-                        if(trainingszeitWasUpdated){
-                    		trainingszeitWasUpdated(trainingszeitCreated);
+                        if(callBackFunctionOnSuccess){
+                        	callBackFunctionOnSuccess(trainingszeitCreated);
+                        }
+                    }else{
+                        if(callBackFunctionOnFailure){
+                        	callBackFunctionOnFailure(response);
+                        }
+                    }
+                });
+            }
+            function changeDuration(trainingszeit, callBackFunctionOnSuccess, callBackFunctionOnFailure){
+                start = moment(trainingszeit.start);
+                end = moment(trainingszeit.end);
+                var data = {
+                    'action': 'change_duration',
+    				'id': trainingszeit.id,
+                    'duration': end.diff(start, 'minutes')
+                };
+                jQuery.post(ajaxurl, data, function(response) {
+                    console.log(response);
+                    trainingszeitCreated = JSON.parse(response);
+                    if(trainingszeitCreated != 'undefined'){
+                        if(callBackFunctionOnSuccess){
+                        	callBackFunctionOnSuccess(trainingszeitCreated);
                         }
                     }else{
                         if(callBackFunctionOnFailure){
@@ -281,7 +309,7 @@ class ManageTrainingTimes{
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
        	$weekDay = $_POST ['weekday'];
        	$time = $_POST['time'];
-       	$duration =  intval ( $_POST ['durationInMin'] );
+       	$duration =  intval ( $_POST ['duration'] );
        	$trainigszeit = new Trainingszeit($weekDay, $time, $duration);
        	echo $trainigszeit->toJSON();
        	wp_die ();
@@ -304,6 +332,26 @@ class ManageTrainingTimes{
        	}else{
        		global $wpdb;
        		echo "Fehler beim Speichern der neuen Startzeit:\n";
+       		$wpdb->print_error();
+       	}
+       	wp_die ();
+    }
+    public static function change_duration() {
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
+       	$id = intval($_POST ['id']);
+       	$duration = intval($_POST['duration']);
+       	
+       	$trainigszeit = Trainingszeit::get_by_id($id);
+       	if(is_null($trainigszeit)){
+       		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
+       		wp_die();
+       	}
+       	$trainigszeit->set_dauer($duration);
+       	if($trainigszeit->save()){
+       		echo $trainigszeit->toJSON();
+       	}else{
+       		global $wpdb;
+       		echo "Fehler beim Speichern der neuen Trainingsdauer:\n";
        		$wpdb->print_error();
        	}
        	wp_die ();

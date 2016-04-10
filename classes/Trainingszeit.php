@@ -46,7 +46,7 @@ class Trainingszeit extends WPDBObject{
 			  halle mediumint(9) unsigned,
 			  wochentag ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'),
 			  uhrzeit char(5) NOT NULL,
-			  dauer tinyint NOT NULL,
+			  dauer int NOT NULL,
 			  hinweis text NULL,
 			  PRIMARY KEY (id),
  			  FOREIGN KEY (mannschaft) REFERENCES ".Mannschaft::table_name()."(id),
@@ -117,6 +117,9 @@ class Trainingszeit extends WPDBObject{
 	}
 	public function set_wochentag($wochentag){
 		$this->wochentag = $wochentag;
+	}
+	public function set_dauer($dauer){
+		$this->dauer = $dauer;
 	}
 }
 ?>
