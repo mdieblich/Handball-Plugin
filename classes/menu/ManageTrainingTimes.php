@@ -174,6 +174,7 @@ class ManageTrainingTimes{
                     timeFormat: 'H:mm',
                     defaultView: 'agendaWeek',
                     columnFormat: 'ddd',
+                    snapDuration: '00:15',
                     eventSources:[ unassignedHallenzeiten, nptHallenzeiten, jdsHallenzeiten ],
                     eventDrop: function(event, delta, revertFunc) {
 
@@ -263,7 +264,6 @@ class ManageTrainingTimes{
                     'weekday': start.locale('en').format('dddd')
                 }
                 jQuery.post(ajaxurl, data, function(response) {
-                    console.log(response);
                     trainingszeitCreated = JSON.parse(response);
                     if(trainingszeitCreated != 'undefined'){
                         if(callBackFunctionOnSuccess){
@@ -285,7 +285,6 @@ class ManageTrainingTimes{
                     'duration': end.diff(start, 'minutes')
                 };
                 jQuery.post(ajaxurl, data, function(response) {
-                    console.log(response);
                     trainingszeitCreated = JSON.parse(response);
                     if(trainingszeitCreated != 'undefined'){
                         if(callBackFunctionOnSuccess){
