@@ -81,10 +81,11 @@ class Trainingszeit extends WPDBObject{
 	}
 	
 	private function to_fullcalendar_io_event(){
+		$teamname = is_null($this->mannschaft) ? 'Kein Team' : Mannschaft::get_by_id($this->mannschaft)->get_name();
 		return 
 			"{\n"
 				."id: ".$this->get_id().",\n"
-				."title: 'Training',\n"
+				."title: '$teamname',\n"
 				.'start: \''.$this->get_start_in_current_week()."',\n"
 				.'end: \''.$this->get_end_in_current_week()."',\n"
 				.'halle: \''.$this->halle."',\n"

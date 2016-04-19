@@ -29,7 +29,7 @@ class ManageTeamPage {
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Team_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/User_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Mannschaft.php');
-		echo \handball\input\team_select('mannschaft', "window.location.href='admin.php?page=".static::$MENU_SLUG."&mannschaft='+this.value");
+		echo \handball\input\team_select('mannschaft', 'mannschaft', "window.location.href='admin.php?page=".static::$MENU_SLUG."&mannschaft='+this.value");
 		if(isset($_GET['mannschaft'])){
 			$team = \handball\Mannschaft::get_by_id(intval($_GET['mannschaft']));
 			

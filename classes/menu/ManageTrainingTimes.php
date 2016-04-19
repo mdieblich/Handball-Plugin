@@ -36,8 +36,8 @@ class ManageTrainingTimes{
 		if (isset ( $_POST ['createHall'] )) {
 			$neue_halle = new \handball\Halle( $_POST ['Hallenname'], $_POST ['Hallenabkuerzung'], $_POST ['Adresse'] );
 		}
-		if (isset ( $_GET ['delete'] )) {
-			$delete_id = intval ( $_GET ['delete'] );
+		if (isset ( $_GET ['deleteHall'] )) {
+			$delete_id = intval ( $_GET ['deleteHall'] );
 			\handball\Halle::delete ( $delete_id );
 		}
 		echo "<h3>Hallen</h3>";
@@ -59,7 +59,7 @@ class ManageTrainingTimes{
 	            <td><?php echo $hall->get_abkuerzung(); ?></td>
 	            <td><?php echo $hall->get_adresse(); ?></td>
 	            <td><a
-	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&delete=<?php echo $hall->get_id(); ?>">Löschen</a></td>
+	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&deleteHall=<?php echo $hall->get_id(); ?>">Löschen</a></td>
             </tr>
             <?php } ?>
 	        <tr>
@@ -93,18 +93,18 @@ class ManageTrainingTimes{
         <div id="currenttermin" style="margin: 1em 2em 0em; padding: 0.5em; background: white;  display:inline-block; ">
             <b>Aktuell ausgewählt:</b><br>
             <form method="post">
-            <input type="hidden" name="edit_id" value="-1">
             <?php
-            	echo \handball\input\team_select('Mannschaft'); 
-            	echo \handball\input\hall_select('Halle');
+            	echo \handball\input\team_select('Mannschaft', 'edit_mannschaft'); 
+            	echo \handball\input\hall_select('Halle', 'edit_halle');
             ?>
             <br>
             <b>Trainingshinweis:</b><br>
-            <textarea name="trainingshinweis"></textarea><br>
+            <textarea name="trainingshinweis" id="trainingshinweis"></textarea><br>
+            <input type="hidden" name="id" id="edit_id" value="-1" disabled size="3">
              <?php submit_button('Speichern', 'primary','Speichern', false); ?>
             </form>
             <form method="post">
-                <input type="hidden" name="delete_id" value="-1">
+                <input type="hidden" name="id" id="delete_id" value="-1">
              <?php submit_button('Löschen', 'primary','Löschen', false); ?>
             </form>
         </div>
@@ -127,19 +127,7 @@ class ManageTrainingTimes{
         	var selectedEvent = null;
         	var originalColorOfSelectedEvent = '';
         	var originalTextColorOfSelectedEvent = '';
-        
-            heute1700 = {
-                    title: 'Training',
-                    start: '<?php echo date('Y-m-d');?>T17:00:00',
-                    end: '<?php echo date('Y-m-d');?>T18:30:00'
-            };
-            heute1900 = {
-                    title: 'Training',
-                    start: '<?php echo date('Y-m-d');?>T19:00:00',
-                    end: '<?php echo date('Y-m-d');?>T20:30:00'
-               }
 
-	
             var unassignedHallenzeiten = {
 				color: unassignedColor,
 				events:
@@ -147,25 +135,25 @@ class ManageTrainingTimes{
 					<?php 
 					require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
 					$unassignedTrainingTimes = Trainingszeit::get('halle is null');
-					echo '// '.count($unassignedTrainingTimes)."\n";
 					$fullcalender_events = Trainingszeit::get_fullcalender_io_events($unassignedTrainingTimes);
 					echo implode(", \n", $fullcalender_events);
 					?>
 					]
             };
-      
-            var nptHallenzeiten = {
-               events: [heute1700],
-	           color: 'red',
-	           halle: 'NPT'
-	        };
-            var jdsHallenzeiten = {
-               events: [heute1900],
-               color: 'black',
-               halle: 'JDS'
-           };
+            <?php 
+            // erstellen der Event-Sources für alle zugewiesenen Hallenzeiten
+			require_once (HANDBASE_PLUGIN_DIR . '/classes/Halle.php');
+            foreach($alle_hallen as $halle){
+            	echo 'var '
+					.$halle->get_fullcalendar_io_event_source_name()
+	            	.' = '
+					.$halle->get_trainingszeiten_as_fullcalendar_io_event_source()
+					.";\n";
+            }
+            ?>
         
             jQuery(document).ready(function($) {
+                
                 $('#calendar').fullCalendar({
                     header: {
                         left: false,
@@ -186,7 +174,15 @@ class ManageTrainingTimes{
 //                         end: '22:00',
 //                         dow: [ 1, 2, 3, 4, 5]
 //                     },
-                    eventSources:[ unassignedHallenzeiten, nptHallenzeiten, jdsHallenzeiten ],
+                    eventSources:[ 
+                    <?php 
+                    $hallenzeitenVariableNames = array('unassignedHallenzeiten');
+                    foreach($alle_hallen as $halle){
+                    	$hallenzeitenVariableNames[] = $halle->get_fullcalendar_io_event_source_name();	
+                    }
+                    echo implode(',', $hallenzeitenVariableNames)
+                    ?>
+                                 ],
                     eventDrop: function(event, delta, revertFunc) {
 
 //                      if (!confirm("Are you sure about this change?")) {
@@ -215,18 +211,7 @@ class ManageTrainingTimes{
                     },
                     eventClick: function(event, jsEvent, view) {
 
-                    	if(selectedEvent){
-                    		selectedEvent.color = originalColorOfSelectedEvent;
-                    		selectedEvent.textColor = originalTextColorOfSelectedEvent;
-                            $('#calendar').fullCalendar('updateEvent', selectedEvent);
-                    	}
-                    	originalColorOfSelectedEvent = event.color;
-                    	originalTextColorOfSelectedEvent = event.textColor;
-                        event.color = 'white';
-                        event.textColor = 	'black';
-                    	selectedEvent = event;
-
-                        $('#calendar').fullCalendar('updateEvent', event);
+                    	selectEvent(event);
 
                     },
                     dayClick: function(date, jsEvent, view) {
@@ -246,6 +231,26 @@ class ManageTrainingTimes{
 
                     }
                  });
+
+
+                function selectEvent(event){
+                	if(selectedEvent){
+                		selectedEvent.color = originalColorOfSelectedEvent;
+                		selectedEvent.textColor = originalTextColorOfSelectedEvent;
+                        $('#calendar').fullCalendar('updateEvent', selectedEvent);
+                	}
+                	originalColorOfSelectedEvent = event.color;
+                	originalTextColorOfSelectedEvent = event.textColor;
+                    event.color = 'white';
+                    event.textColor = 	'black';
+                	selectedEvent = event;
+
+                    $('#calendar').fullCalendar('updateEvent', event);
+                    $('#edit_id').val(event.id);
+                    $('#delete_id').val(event.id);
+                    $('#edit_mannschaft').val(event.mannschaft);
+                    $('#edit_halle').val(event.halle);
+                }
             });
 
             function createTraningszeitOnServer(trainingszeit, trainingszeitWasCreated){
@@ -320,7 +325,6 @@ class ManageTrainingTimes{
 
         </script>
         <div id="calendar" style="max-width:900px; float:left"></div>
-        <button onclick="nextDay()">Klick</button>
         <?php 
         
     }

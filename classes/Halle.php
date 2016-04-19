@@ -7,12 +7,14 @@ class Halle extends WPDBObject{
 	private $name;
 	private $abkuerzung;
 	private $adresse;
+	private $color;
 	
-	public function __construct($name, $abkuerzung, $adresse, $id=null){
+	public function __construct($name, $abkuerzung, $adresse, $color, $id=null){
 		// TODO SQLInjection abfangen 
 		$this->name = $name;
 		$this->abkuerzung = $abkuerzung;
 		$this->adresse = $adresse;
+		$this->color = $color;
 		parent::__construct($id);
 	}
 	
@@ -26,6 +28,9 @@ class Halle extends WPDBObject{
 	public function get_adresse(){
 		return $this->adresse;
 	}
+	public function get_color(){
+		return $this->color;
+	}
 	
 	public function get_name_for_button(){
 		return 'halle'.$this->get_id();
@@ -36,6 +41,7 @@ class Halle extends WPDBObject{
 		$array['name'] = $this->name;
 		$array['abkuerzung'] = $this->abkuerzung;
 		$array['adresse'] = $this->adresse;
+		$array['color'] = $this->color;
 		return $array;
 	}
 	
@@ -50,6 +56,7 @@ class Halle extends WPDBObject{
 			  name tinytext NOT NULL,
 			  abkuerzung tinytext NOT NULL,
 			  adresse text NOT NULL,
+			  color tinytext NOT NULL,
 			  PRIMARY KEY (id)
 		) ".$charset_collate.";";
 	
@@ -57,11 +64,23 @@ class Halle extends WPDBObject{
 	}
 	
 	protected static function row_to_object($row_object){
-		return new Halle($row_object->name, $row_object->abkuerzung, $row_object->adresse, $row_object->id);
+		return new Halle($row_object->name, $row_object->abkuerzung, $row_object->adresse, $row_object->color, $row_object->id);
+	}
+	
+	public function get_fullcalendar_io_event_source_name(){
+		return $this->get_abkuerzung().'Hallenzeiten';
 	}
 	
 	public function get_trainingszeiten_as_fullcalendar_io_event_source(){
-		
+		$fullcalender_events = Trainingszeit::get_fullcalender_io_events($this->get_trainingszeiten());
+		return 	"{\n"
+				."color: '".$this->get_color()."',\n"
+				.'events: ['.implode(", \n", $fullcalender_events)."]\n"
+				."\n}";
+	}
+	
+	private function get_trainingszeiten(){
+		return Trainingszeit::get('halle='.$this->get_id());
 	}
 }
 ?>
