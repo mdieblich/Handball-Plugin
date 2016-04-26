@@ -124,7 +124,7 @@ class ManageTrainingTimes{
             ?>
             <br>
             <b>Trainingshinweis:</b><br>
-            <textarea name="comment" id="trainingshinweis"></textarea><br>
+            <textarea name="comment" id="edit_comment"></textarea><br>
             <input type="hidden" name="edit_id" id="edit_id" value="-1" size="3">
              <?php submit_button('Speichern', 'primary','Speichern', false); ?>
             </form>
@@ -275,6 +275,7 @@ class ManageTrainingTimes{
                     $('#delete_id').val(event.id);
                     $('#edit_mannschaft').val(event.mannschaft);
                     $('#edit_halle').val(event.halle);
+                    $('#edit_comment').val(event.comment);
                 }
             });
 
