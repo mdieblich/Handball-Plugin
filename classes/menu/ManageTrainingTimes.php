@@ -34,7 +34,11 @@ class ManageTrainingTimes{
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Hall_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Weekday_Select.php');
 		if (isset ( $_POST ['createHall'] )) {
-			$neue_halle = new \handball\Halle( $_POST ['Hallenname'], $_POST ['Hallenabkuerzung'], $_POST ['Adresse'] );
+			$neue_halle = new \handball\Halle( 
+					$_POST ['Hallenname'], 
+					$_POST ['Hallenabkuerzung'], 
+					$_POST ['Adresse'],
+					$_POST ['Farbe']);
 		}
 		if (isset ( $_GET ['deleteHall'] )) {
 			$delete_id = intval ( $_GET ['deleteHall'] );
@@ -51,6 +55,7 @@ class ManageTrainingTimes{
                 <th>Halle</th>
                 <th>Abkürzung</th>
                 <th>Adresse</th>
+                <th>Farbe</th>
                 <td></td>
             </tr>
             <?php foreach ( $alle_hallen as $hall ) { ?>
@@ -58,6 +63,7 @@ class ManageTrainingTimes{
 	            <td><?php echo $hall->get_name(); ?></td>
 	            <td><?php echo $hall->get_abkuerzung(); ?></td>
 	            <td><?php echo $hall->get_adresse(); ?></td>
+	            <td><?php echo $hall->get_color(); ?></td>
 	            <td><a
 	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&deleteHall=<?php echo $hall->get_id(); ?>">Löschen</a></td>
             </tr>
@@ -66,6 +72,7 @@ class ManageTrainingTimes{
 	            <td><input type="text" name="Hallenname" placeholder="Name"></td>
 	            <td><input type="text" name="Hallenabkuerzung" placeholder="Abkürzung"></td>
 	            <td><input type="text" name="Adresse" placeholder="Adresse"></td>
+	            <td><input type="text" name="Farbe" placeholder="Farbe"></td>
 	            <td><input type="hidden" name="createHall" value="true">
 	                <?php submit_button('Anlegen', 'primary','Anlegen', false); ?></td>
 	        </tr>
