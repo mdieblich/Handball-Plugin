@@ -47,8 +47,14 @@ class ManageTrainingTimes{
 		if( isset ( $_POST['edit_id'] ) ){
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
 			$edit_id = intval($_POST['edit_id']);
-			$team_id = intval($_POST['team_id']);
-			$hall_id = intval($_POST['hall_id']);
+			$team_id = null;
+			if($_POST['team_id'] != ''){
+				$team_id = intval($_POST['team_id']);
+			}
+			$hall_id = null;
+			if($_POST['hall_id'] != ''){
+				$hall_id = intval($_POST['hall_id']);
+			}
 			$comment = $_POST['comment'];
 			$trainigszeit = \handball\Trainingszeit::get_by_id($edit_id);
 			$trainigszeit->set_team($team_id);
