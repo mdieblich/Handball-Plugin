@@ -122,5 +122,14 @@ class Trainingszeit extends WPDBObject{
 	public function set_dauer($dauer){
 		$this->dauer = $dauer;
 	}
+	public function set_team($team_id){
+		$this->mannschaft = $team_id;
+	}
+	public function set_hall($hall_id){
+		$this->halle = $hall_id;
+	}
+	public function set_comment($comment){
+		$this->hinweis = $comment;
+	}
 }
 ?>

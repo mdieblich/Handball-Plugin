@@ -44,6 +44,18 @@ class ManageTrainingTimes{
 			$delete_id = intval ( $_GET ['deleteHall'] );
 			\handball\Halle::delete ( $delete_id );
 		}
+		if( isset ( $_POST['edit_id'] ) ){
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
+			$edit_id = intval($_POST['edit_id']);
+			$team_id = intval($_POST['team_id']);
+			$hall_id = intval($_POST['hall_id']);
+			$comment = $_POST['comment'];
+			$trainigszeit = \handball\Trainingszeit::get_by_id($edit_id);
+			$trainigszeit->set_team($team_id);
+			$trainigszeit->set_hall($hall_id);
+			$trainigszeit->set_comment($comment);
+			$trainigszeit->save();
+		}
 		echo "<h3>Hallen</h3>";
 		echo "<strong>Hinweis:</strong> Hallen können (noch) nicht geändert, nur gelöscht werden.<br><br>";
 		$alle_hallen = \handball\Halle::get_all ();
@@ -101,13 +113,13 @@ class ManageTrainingTimes{
             <b>Aktuell ausgewählt:</b><br>
             <form method="post">
             <?php
-            	echo \handball\input\team_select('Mannschaft', 'edit_mannschaft'); 
-            	echo \handball\input\hall_select('Halle', 'edit_halle');
+            	echo \handball\input\team_select('team_id', 'edit_mannschaft'); 
+            	echo \handball\input\hall_select('hall_id', 'edit_halle');
             ?>
             <br>
             <b>Trainingshinweis:</b><br>
-            <textarea name="trainingshinweis" id="trainingshinweis"></textarea><br>
-            <input type="hidden" name="id" id="edit_id" value="-1" disabled size="3">
+            <textarea name="comment" id="trainingshinweis"></textarea><br>
+            <input type="hidden" name="edit_id" id="edit_id" value="-1" size="3">
              <?php submit_button('Speichern', 'primary','Speichern', false); ?>
             </form>
             <form method="post">
