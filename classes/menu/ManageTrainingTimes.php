@@ -305,14 +305,13 @@ class ManageTrainingTimes{
 		<br clear="all" />
 		<h3>Trainingszeiten</h3>
         <div id="hallen" style="max-width:900px; margin: 0.8em 2em;">
-            Folgende <b>Hallen</b> anzeigen:<br>
         <?php foreach($alle_hallen as $halle){
             $id = 'halle_'.$halle->get_id();
-            echo '<span><label for="checkbox'.$id.'">'.$halle->get_abkuerzung().'</label>';
+            echo '<span style="background-color: '.$halle->get_color().'; color: white; padding: 3px; margin: 5px;"><label for="checkbox'.$id.'">'.$halle->get_abkuerzung().'&nbsp;</label>';
             echo '<input type="checkbox" id="checkbox'.$id.'" value="'.$id.'" onchange="toggleHall('.$halle->get_fullcalendar_io_event_source_name().', this.checked)" checked></span>';
         } ?>
-        	<span>
-        		<label for="checkboxUnassignedHall"><i>(ohne Halle)</i></label>
+        	<span style="background-color: red; color:white; padding: 3px; margin: 5px;">
+        		<label for="checkboxUnassignedHall"><i>(ohne Halle)</i>&nbsp;</label>
         		<input type="checkbox" id="checkboxUnassignedHall" value="(ohne Halle)" onchange="toggleHall(unassignedHallenzeiten, this.checked)" checked>
         	</span>
         </div>
