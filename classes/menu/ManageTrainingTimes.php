@@ -117,11 +117,6 @@ class ManageTrainingTimes{
                     scrollTime: '16:00',
                     snapDuration: '00:15',
                     allDaySlot: false,
-//                     businessHours: {
-//                     	start: '15:00', 
-//                         end: '22:00',
-//                         dow: [ 1, 2, 3, 4, 5]
-//                     },
                     eventSources:[ 
                     <?php 
                     $hallenzeitenVariableNames = array('unassignedHallenzeiten');
@@ -132,10 +127,6 @@ class ManageTrainingTimes{
                     ?>
                                  ],
                     eventDrop: function(event, delta, revertFunc) {
-
-//                      if (!confirm("Are you sure about this change?")) {
-//                          revertFunc();
-//                      }
                     	callBackFunctionOnSuccess = null;
                     	callBackFunctionOnFailure = function(response){
 							alert(response);
@@ -144,11 +135,6 @@ class ManageTrainingTimes{
                     	changeStart(event, callBackFunctionOnSuccess, callBackFunctionOnFailure);
                     },
                     eventResize: function(event, delta, revertFunc) {
-
-//                      if (!confirm("Are you sure about this change?")) {
-//                          revertFunc();
-//                      }
-
                     	callBackFunctionOnSuccess = null;
                     	callBackFunctionOnFailure = function(response){
 							alert(response);
@@ -281,7 +267,6 @@ class ManageTrainingTimes{
             function toggleHall(eventSource, visible){
 	            fullcalendarAction = visible ? 'addEventSource': 'removeEventSource';
                 jQuery('#calendar').fullCalendar(fullcalendarAction, eventSource);
-                //hier weiter
             }
 
 
