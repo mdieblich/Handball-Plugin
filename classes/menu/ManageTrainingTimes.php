@@ -103,9 +103,13 @@ class ManageTrainingTimes{
             Folgende <b>Hallen</b> anzeigen:<br>
         <?php foreach($alle_hallen as $halle){
             $id = 'halle_'.$halle->get_id();
-            echo '<span><label for="'.$id.'">'.$halle->get_abkuerzung().'</label>';
-            echo '<input type="checkbox" id="'.$id.'" value="'.$id.'" checked></span>';
+            echo '<span><label for="checkbox'.$id.'">'.$halle->get_abkuerzung().'</label>';
+            echo '<input type="checkbox" id="checkbox'.$id.'" value="'.$id.'" onchange="toggleHall('.$halle->get_fullcalendar_io_event_source_name().', this.checked)" checked></span>';
         } ?>
+        	<span>
+        		<label for="checkboxUnassignedHall"><i>(ohne Halle)</i></label>
+        		<input type="checkbox" id="checkboxUnassignedHall" value="(ohne Halle)" onchange="toggleHall(unassignedHallenzeiten, this.checked)" checked>
+        	</span>
         </div>
         <div id="mannschaften" style="max-width:900px; margin: 0.8em 2em;">
             Folgende <b>Mannschaften</b> anzeigen:<br>
@@ -277,6 +281,7 @@ class ManageTrainingTimes{
                     $('#edit_halle').val(event.halle);
                     $('#edit_comment').val(event.comment);
                 }
+                
             });
 
             function createTraningszeitOnServer(trainingszeit, trainingszeitWasCreated){
@@ -315,15 +320,20 @@ class ManageTrainingTimes{
                     'weekday': start.locale('en').format('dddd')
                 }
                 jQuery.post(ajaxurl, data, function(response) {
-                    trainingszeitCreated = JSON.parse(response);
-                    if(trainingszeitCreated != 'undefined'){
-                        if(callBackFunctionOnSuccess){
-                        	callBackFunctionOnSuccess(trainingszeitCreated);
-                        }
-                    }else{
-                        if(callBackFunctionOnFailure){
-                        	callBackFunctionOnFailure(response);
-                        }
+                    try{
+	                    trainingszeitCreated = JSON.parse(response);
+	                    if(trainingszeitCreated != 'undefined'){
+	                        if(callBackFunctionOnSuccess){
+	                        	callBackFunctionOnSuccess(trainingszeitCreated);
+	                        }
+	                    }else{
+	                        if(callBackFunctionOnFailure){
+	                        	callBackFunctionOnFailure(response);
+	                        }
+	                    }
+                    }catch(e){
+                        console.log(e);
+						console.log(response);
                     }
                 });
             }
@@ -348,6 +358,13 @@ class ManageTrainingTimes{
                     }
                 });
             }
+
+            function toggleHall(eventSource, visible){
+	            fullcalendarAction = visible ? 'addEventSource': 'removeEventSource';
+                jQuery('#calendar').fullCalendar(fullcalendarAction, eventSource);
+                //hier weiter
+            }
+
 
         </script>
         <div id="calendar" style="max-width:900px; float:left"></div>
