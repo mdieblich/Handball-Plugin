@@ -49,7 +49,7 @@ abstract class WPDBObject{
 			return null; // vorher stand hier null
 		}if($object instanceof DBObject){
 			return $object->get_id();
-		}else if(is_integer($object)){
+		}else if(is_numeric($object)){
 			return $object;
 		}
 		throw new \Exception($object.' ist weder null, ein DBObject, noch ein Integer');
