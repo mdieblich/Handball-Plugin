@@ -62,94 +62,13 @@ class ManageTrainingTimes{
 			$trainigszeit->set_comment($comment);
 			$trainigszeit->save();
 		}
+		
 		echo "<h3>Hallen</h3>";
 		echo "<strong>Hinweis:</strong> Hallen können (noch) nicht geändert, nur gelöscht werden.<br><br>";
 		$alle_hallen = \handball\Halle::get_all ();
 		$alle_mannschaften = \handball\Mannschaft::get_all ();
 		?>
-        <form method="post">
-        <table>
-            <tr>
-                <th>Halle</th>
-                <th>Abkürzung</th>
-                <th>Adresse</th>
-                <th>Farbe</th>
-                <td></td>
-            </tr>
-            <?php foreach ( $alle_hallen as $hall ) { ?>
-            <tr>
-	            <td><?php echo $hall->get_name(); ?></td>
-	            <td><?php echo $hall->get_abkuerzung(); ?></td>
-	            <td><?php echo $hall->get_adresse(); ?></td>
-	            <td><?php echo $hall->get_color(); ?></td>
-	            <td><a
-	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&deleteHall=<?php echo $hall->get_id(); ?>">Löschen</a></td>
-            </tr>
-            <?php } ?>
-	        <tr>
-	            <td><input type="text" name="Hallenname" placeholder="Name"></td>
-	            <td><input type="text" name="Hallenabkuerzung" placeholder="Abkürzung"></td>
-	            <td><input type="text" name="Adresse" placeholder="Adresse"></td>
-	            <td><input type="text" name="Farbe" placeholder="Farbe"></td>
-	            <td><input type="hidden" name="createHall" value="true">
-	                <?php submit_button('Anlegen', 'primary','Anlegen', false); ?></td>
-	        </tr>
-        </table>
-        </form>
-
-		<br clear="all" />
-		<h3>Trainingszeiten</h3>
-        <div id="hallen" style="max-width:900px; margin: 0.8em 2em;">
-            Folgende <b>Hallen</b> anzeigen:<br>
-        <?php foreach($alle_hallen as $halle){
-            $id = 'halle_'.$halle->get_id();
-            echo '<span><label for="checkbox'.$id.'">'.$halle->get_abkuerzung().'</label>';
-            echo '<input type="checkbox" id="checkbox'.$id.'" value="'.$id.'" onchange="toggleHall('.$halle->get_fullcalendar_io_event_source_name().', this.checked)" checked></span>';
-        } ?>
-        	<span>
-        		<label for="checkboxUnassignedHall"><i>(ohne Halle)</i></label>
-        		<input type="checkbox" id="checkboxUnassignedHall" value="(ohne Halle)" onchange="toggleHall(unassignedHallenzeiten, this.checked)" checked>
-        	</span>
-        </div>
-        <div id="mannschaften" style="max-width:900px; margin: 0.8em 2em;">
-            Folgende <b>Mannschaften</b> anzeigen:<br>
-	        <?php foreach($alle_mannschaften as $mannschaft){
-	            $id = 'mannschaft_'.$mannschaft->get_id();
-	            echo '<span><label for="'.$id.'">'.$mannschaft->get_name().'</label>';
-	            echo '<input type="checkbox" id="'.$id.'" value="'.$id.'" checked></span>';
-	        } ?>
-        </div>
-        <div id="currenttermin" style="margin: 1em 2em 0em; padding: 0.5em; background: white;  display:inline-block; ">
-            <b>Aktuell ausgewählt:</b><br>
-            <form method="post">
-            <?php
-            	echo \handball\input\team_select('team_id', 'edit_mannschaft'); 
-            	echo \handball\input\hall_select('hall_id', 'edit_halle');
-            ?>
-            <br>
-            <b>Trainingshinweis:</b><br>
-            <textarea name="comment" id="edit_comment"></textarea><br>
-            <input type="hidden" name="edit_id" id="edit_id" value="-1" size="3">
-             <?php submit_button('Speichern', 'primary','Speichern', false); ?>
-            </form>
-            <form method="post">
-                <input type="hidden" name="id" id="delete_id" value="-1">
-             <?php submit_button('Löschen', 'primary','Löschen', false); ?>
-            </form>
-        </div>
-        
-        <?php 
-		
-		wp_enqueue_style('fullcalendar', plugins_url('/handball-basisplugin/css/fullcalendar.css'));
-		//          wp_enqueue_style('fullcalendar-print', plugins_url('/handball-basisplugin/css/fullcalendar.print.css'), array('fullcalendar'));
-		
-		wp_enqueue_script('moment', plugins_url('/handball-basisplugin/javascript/moment.min.js'));
-		wp_enqueue_script('fullcalendar', plugins_url('/handball-basisplugin/javascript/fullcalendar.min.js'), array('jquery'));
-		wp_enqueue_script('fullcalendar-de', plugins_url('/handball-basisplugin/javascript/fullcalendar-de.js'), array('fullcalendar'));
-		
-		?>
-		                        
-        <script type="text/javascript">
+		<script type="text/javascript">
         // siehe http://fullcalendar.io/docs/
         
         	var unassignedColor = 'red';
@@ -367,6 +286,89 @@ class ManageTrainingTimes{
 
 
         </script>
+        
+        <form method="post">
+        <table>
+            <tr>
+                <th>Halle</th>
+                <th>Abkürzung</th>
+                <th>Adresse</th>
+                <th>Farbe</th>
+                <td></td>
+            </tr>
+            <?php foreach ( $alle_hallen as $hall ) { ?>
+            <tr>
+	            <td><?php echo $hall->get_name(); ?></td>
+	            <td><?php echo $hall->get_abkuerzung(); ?></td>
+	            <td><?php echo $hall->get_adresse(); ?></td>
+	            <td><?php echo $hall->get_color(); ?></td>
+	            <td><a
+	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&deleteHall=<?php echo $hall->get_id(); ?>">Löschen</a></td>
+            </tr>
+            <?php } ?>
+	        <tr>
+	            <td><input type="text" name="Hallenname" placeholder="Name"></td>
+	            <td><input type="text" name="Hallenabkuerzung" placeholder="Abkürzung"></td>
+	            <td><input type="text" name="Adresse" placeholder="Adresse"></td>
+	            <td><input type="text" name="Farbe" placeholder="Farbe"></td>
+	            <td><input type="hidden" name="createHall" value="true">
+	                <?php submit_button('Anlegen', 'primary','Anlegen', false); ?></td>
+	        </tr>
+        </table>
+        </form>
+
+		<br clear="all" />
+		<h3>Trainingszeiten</h3>
+        <div id="hallen" style="max-width:900px; margin: 0.8em 2em;">
+            Folgende <b>Hallen</b> anzeigen:<br>
+        <?php foreach($alle_hallen as $halle){
+            $id = 'halle_'.$halle->get_id();
+            echo '<span><label for="checkbox'.$id.'">'.$halle->get_abkuerzung().'</label>';
+            echo '<input type="checkbox" id="checkbox'.$id.'" value="'.$id.'" onchange="toggleHall('.$halle->get_fullcalendar_io_event_source_name().', this.checked)" checked></span>';
+        } ?>
+        	<span>
+        		<label for="checkboxUnassignedHall"><i>(ohne Halle)</i></label>
+        		<input type="checkbox" id="checkboxUnassignedHall" value="(ohne Halle)" onchange="toggleHall(unassignedHallenzeiten, this.checked)" checked>
+        	</span>
+        </div>
+        <div id="mannschaften" style="max-width:900px; margin: 0.8em 2em;">
+            Folgende <b>Mannschaften</b> anzeigen:<br>
+	        <?php foreach($alle_mannschaften as $mannschaft){
+	            $id = 'mannschaft_'.$mannschaft->get_id();
+	            echo '<span><label for="'.$id.'">'.$mannschaft->get_name().'</label>';
+	            echo '<input type="checkbox" id="'.$id.'" value="'.$id.'" checked></span>';
+	        } ?>
+        </div>
+        <div id="currenttermin" style="margin: 1em 2em 0em; padding: 0.5em; background: white;  display:inline-block; ">
+            <b>Aktuell ausgewählt:</b><br>
+            <form method="post">
+            <?php
+            	echo \handball\input\team_select('team_id', 'edit_mannschaft'); 
+            	echo \handball\input\hall_select('hall_id', 'edit_halle');
+            ?>
+            <br>
+            <b>Trainingshinweis:</b><br>
+            <textarea name="comment" id="edit_comment"></textarea><br>
+            <input type="hidden" name="edit_id" id="edit_id" value="-1" size="3">
+             <?php submit_button('Speichern', 'primary','Speichern', false); ?>
+            </form>
+            <form method="post">
+                <input type="hidden" name="id" id="delete_id" value="-1">
+             <?php submit_button('Löschen', 'primary','Löschen', false); ?>
+            </form>
+        </div>
+        
+        <?php 
+		
+		wp_enqueue_style('fullcalendar', plugins_url('/handball-basisplugin/css/fullcalendar.css'));
+		//          wp_enqueue_style('fullcalendar-print', plugins_url('/handball-basisplugin/css/fullcalendar.print.css'), array('fullcalendar'));
+		
+		wp_enqueue_script('moment', plugins_url('/handball-basisplugin/javascript/moment.min.js'));
+		wp_enqueue_script('fullcalendar', plugins_url('/handball-basisplugin/javascript/fullcalendar.min.js'), array('jquery'));
+		wp_enqueue_script('fullcalendar-de', plugins_url('/handball-basisplugin/javascript/fullcalendar-de.js'), array('fullcalendar'));
+		
+		?>
+		                        
         <div id="calendar" style="max-width:900px; float:left"></div>
         <?php 
         
