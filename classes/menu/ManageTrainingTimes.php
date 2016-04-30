@@ -99,6 +99,27 @@ class ManageTrainingTimes{
 					.";\n";
             }
             ?>
+
+            var allEventSources = [ 
+            	<?php 
+                $hallenzeitenVariableNames = array('unassignedHallenzeiten');
+                foreach($alle_hallen as $halle){
+                	$hallenzeitenVariableNames[] = $halle->get_fullcalendar_io_event_source_name();	
+                }
+                echo implode(',', $hallenzeitenVariableNames)
+                ?>
+			];
+            var teamVisibility = new Array();
+            teamVisibility["Kein Team"] = true;
+<?php 
+            foreach($alle_mannschaften as $mannschaft){
+            	echo "            teamVisibility[\"".$mannschaft->get_name()."\"] = true;\n";
+			}
+?>
+            function toggleTeam(teamName, visible){
+            	teamVisibility[teamName] = visible;
+                jQuery('#calendar').fullCalendar('rerenderEvents');
+            }
         
             jQuery(document).ready(function($) {
                 
@@ -117,15 +138,7 @@ class ManageTrainingTimes{
                     scrollTime: '16:00',
                     snapDuration: '00:15',
                     allDaySlot: false,
-                    eventSources:[ 
-                    <?php 
-                    $hallenzeitenVariableNames = array('unassignedHallenzeiten');
-                    foreach($alle_hallen as $halle){
-                    	$hallenzeitenVariableNames[] = $halle->get_fullcalendar_io_event_source_name();	
-                    }
-                    echo implode(',', $hallenzeitenVariableNames)
-                    ?>
-                                 ],
+                    eventSources: allEventSources,
                     eventDrop: function(event, delta, revertFunc) {
                     	callBackFunctionOnSuccess = null;
                     	callBackFunctionOnFailure = function(response){
@@ -163,6 +176,9 @@ class ManageTrainingTimes{
 
                         });
 
+                    },
+                    eventRender: function(event, element){
+						return teamVisibility[event.mannschaft];
                     }
                  });
 
@@ -239,6 +255,9 @@ class ManageTrainingTimes{
                     }catch(e){
                         console.log(e);
 						console.log(response);
+                        if(callBackFunctionOnFailure){
+                        	callBackFunctionOnFailure(response);
+                        }
                     }
                 });
             }
@@ -251,12 +270,20 @@ class ManageTrainingTimes{
                     'duration': end.diff(start, 'minutes')
                 };
                 jQuery.post(ajaxurl, data, function(response) {
-                    trainingszeitCreated = JSON.parse(response);
-                    if(trainingszeitCreated != 'undefined'){
-                        if(callBackFunctionOnSuccess){
-                        	callBackFunctionOnSuccess(trainingszeitCreated);
-                        }
-                    }else{
+                    try{
+	                    trainingszeitCreated = JSON.parse(response);
+	                    if(trainingszeitCreated != 'undefined'){
+	                        if(callBackFunctionOnSuccess){
+	                        	callBackFunctionOnSuccess(trainingszeitCreated);
+	                        }
+	                    }else{
+	                        if(callBackFunctionOnFailure){
+	                        	callBackFunctionOnFailure(response);
+	                        }
+	                    }
+                    }catch(e){
+                        console.log(e);
+						console.log(response);
                         if(callBackFunctionOnFailure){
                         	callBackFunctionOnFailure(response);
                         }
@@ -268,7 +295,6 @@ class ManageTrainingTimes{
 	            fullcalendarAction = visible ? 'addEventSource': 'removeEventSource';
                 jQuery('#calendar').fullCalendar(fullcalendarAction, eventSource);
             }
-
 
         </script>
         
@@ -319,9 +345,13 @@ class ManageTrainingTimes{
             Folgende <b>Mannschaften</b> anzeigen:<br>
 	        <?php foreach($alle_mannschaften as $mannschaft){
 	            $id = 'mannschaft_'.$mannschaft->get_id();
-	            echo '<span><label for="'.$id.'">'.$mannschaft->get_name().'</label>';
-	            echo '<input type="checkbox" id="'.$id.'" value="'.$id.'" checked></span>';
+	            echo '<span style="padding: 3px; margin: 5px;"><label for="'.$id.'">'.$mannschaft->get_name().'</label>';
+	            echo '<input type="checkbox" id="'.$id.'" value="'.$id.'" onchange="toggleTeam(\''.$mannschaft->get_name().'\', this.checked);" checked></span>';
 	        } ?>
+	        <span style="padding: 3px; margin: 5px;">
+        		<label for="checkboxNoTeam"><i>(Kein Team)</i>&nbsp;</label>
+        		<input type="checkbox" id="checkboxNoTeam" value="(ohne Halle)" onchange="toggleTeam('Kein Team', this.checked)" checked>
+        	</span>
         </div>
         <div id="currenttermin" style="margin: 1em 2em 0em; padding: 0.5em; background: white;  display:inline-block; ">
             <b>Aktuell ausgewählt:</b><br>
