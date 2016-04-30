@@ -1,7 +1,7 @@
 <?php
 namespace handball\input;
 
-use handball\Handballer;
+use handball\Player;
 
 require_once(ABSPATH.'wp-includes/user.php');
 
@@ -12,7 +12,7 @@ function select_user($name, $onchange=null, $select=-1){
 		<option value="-1" style="color:silver; font-style:italic">niemand</option>
 	<?php 
 		// TODO $all_users cachen oder als Singleton
-		// TODO dies �ber Handballer::get_all() machen.
+		// TODO dies mit Player::get_all() machen.
 		$all_users = get_users(array(
 				'orderby'      => 'nicename',
 				'order'        => 'ASC'

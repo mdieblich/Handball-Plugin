@@ -44,18 +44,18 @@ function deactivate(){
 }
 
 function show_extra_profile_fields( $user ) {
-	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Handballer.php');
-	$handballer = new Handballer($user->ID);
-	$handballer->show_profile_extras();
+	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Player.php');
+	$player = new Player($user->ID);
+	$player->show_profile_extras();
 }
 
 function save_extra_profile_fields( $user_id ) {
-	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Handballer.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Player.php');
 	if ( !current_user_can( 'edit_user', $user_id ) )
 		return false;
 	
-	$handballer = new Handballer($user_id);
-	$handballer->save_from_post();
+	$player = new Player($user_id);
+	$player->save_from_post();
 
 }
 

@@ -4,7 +4,7 @@ namespace handball;
 
 require_once(ABSPATH.'wp-admin/includes/upgrade.php');
 require_once(HANDBASE_PLUGIN_DIR.'/php/classes/WPDBObject.php');
-require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Handballer.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Player.php');
 
 /**
  * TODO Datenbank-Schema-Upgrade: https://codex.wordpress.org/Creating_Tables_with_Plugins
@@ -25,16 +25,16 @@ class Team extends WPDBObject{
 	
 	public function __construct($name, $trainer = null, $cotrainer=null, $id=null){
 		$this->name = $name;
-		$this->trainer = Handballer::ensure_handballer($trainer);
-		$this->cotrainer = Handballer::ensure_handballer($cotrainer);
+		$this->trainer = Player::ensure_player($trainer);
+		$this->cotrainer = Player::ensure_player($cotrainer);
 		parent::__construct($id);
 	}
 
 	protected function to_array(){
 		$array = parent::to_array();
 		$array['name'] = $this->name;
-		$array['trainer'] = Handballer::as_id_or_null($this->trainer);
-		$array['cotrainer'] = Handballer::as_id_or_null($this->cotrainer);
+		$array['trainer'] = Player::as_id_or_null($this->trainer);
+		$array['cotrainer'] = Player::as_id_or_null($this->cotrainer);
 		return $array;
 	}
 	
@@ -43,10 +43,10 @@ class Team extends WPDBObject{
 	}
 
 	public function get_trainer(){
-		return new Handballer($this->trainer);
+		return new Player($this->trainer);
 	}
 	public function get_cotrainer(){
-		return new Handballer($this->cotrainer);
+		return new Player($this->cotrainer);
 	}
 	
 	public function is_stammspieler($user){
@@ -151,8 +151,8 @@ class Team extends WPDBObject{
 			  trainer bigint(20) unsigned,
 			  cotrainer bigint(20) unsigned,
 			  PRIMARY KEY (id),
- 			  FOREIGN KEY (trainer) REFERENCES ".Handballer::table_name()."(ID),
- 			  FOREIGN KEY (cotrainer) REFERENCES ".Handballer::table_name()."(ID)
+ 			  FOREIGN KEY (trainer) REFERENCES ".Player::table_name()."(ID),
+ 			  FOREIGN KEY (cotrainer) REFERENCES ".Player::table_name()."(ID)
 		) ".$charset_collate.";";
 	
 		dbDelta( $sql );
@@ -162,7 +162,7 @@ class Team extends WPDBObject{
 			  team mediumint(9) unsigned NOT NULL,
 			  user bigint(20) unsigned NOT NULL,
  			  FOREIGN KEY (team) REFERENCES ".static::table_name()."(id),
- 			  FOREIGN KEY (user) REFERENCES ".Handballer::table_name()."(id)
+ 			  FOREIGN KEY (user) REFERENCES ".Player::table_name()."(id)
 		) ".$charset_collate.";";
 		dbDelta( $sql2 );
 		
@@ -171,7 +171,7 @@ class Team extends WPDBObject{
 			  team mediumint(9) unsigned NOT NULL,
 			  user bigint(20) unsigned NOT NULL,
  			  FOREIGN KEY (team) REFERENCES ".static::table_name()."(id),
- 			  FOREIGN KEY (user) REFERENCES ".Handballer::table_name()."(id)
+ 			  FOREIGN KEY (user) REFERENCES ".Player::table_name()."(id)
 		) ".$charset_collate.";";
 		dbDelta( $sql3 );
 	}

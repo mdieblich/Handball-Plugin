@@ -4,7 +4,7 @@ namespace handball;
 
 require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Spielposition.php');
 
-class Handballer{
+class Player{
 	
 	private $id;
 	/** Auf welcher Position spielt dieser Spieler? */
@@ -219,30 +219,30 @@ class Handballer{
 		return $wpdb->prefix."users";
 	}
 	
-	public static function ensure_handballer($handballer){
-		if(is_null($handballer)){
-			return $handballer;
+	public static function ensure_player($player){
+		if(is_null($player)){
+			return $player;
 		}
-		if(is_int($handballer)){
-			return $handballer;
+		if(is_int($player)){
+			return $player;
 		}
-		if($handballer instanceof Handballer){
-			return $handballer;
+		if($player instanceof Player){
+			return $player;
 		}
-		throw new \Exception($handballer.' ist weder null, noch eine id, noch ein Handballer');
+		throw new \Exception($player.' ist weder null, noch eine id, noch ein Spieler');
 	}
 	
-	public static function as_id_or_null($handballer){
-		if(is_null($handballer)){
+	public static function as_id_or_null($player){
+		if(is_null($player)){
 			return null;
 		}
-		if(is_int($handballer)){
-			return $handballer;
+		if(is_int($player)){
+			return $player;
 		}
-		if($handballer instanceof Handballer){
-			return $handballer->id;
+		if($player instanceof Player){
+			return $player->id;
 		}
-		throw new \Exception($handballer.' ist weder eine id, noch ein Handballer');
+		throw new \Exception($player.' ist weder eine id, noch ein Spieler');
 	}
 }
 ?>

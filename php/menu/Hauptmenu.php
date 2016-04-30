@@ -1,9 +1,9 @@
 <?php
 namespace handball\menu;
 
-use handball\Handballer;
+use handball\Player;
 
-require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Handballer.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Player.php');
 
 class Hauptmenu{
 
@@ -25,7 +25,7 @@ class Hauptmenu{
 	
 	public function create_handball_page(){
 		$current_user = wp_get_current_user();
-		$handballer = new Handballer($current_user->ID);
+		new Player($current_user->ID);
 		?>
 	        <div class="wrap">
 	            <h2>Handball</h2>
