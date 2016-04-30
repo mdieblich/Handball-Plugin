@@ -32,7 +32,6 @@ class ManageTrainingTimes{
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Team.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Team_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Location_Select.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Weekday_Select.php');
 		if (isset ( $_POST ['create_location'] )) {
 			$new_location = new \handball\Location( 
 					$_POST ['location_name'], 
