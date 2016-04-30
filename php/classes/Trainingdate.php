@@ -2,7 +2,7 @@
 namespace handball;
 require_once(HANDBASE_PLUGIN_DIR.'/php/classes/WPDBObject.php');
 
-class Trainingstermin extends WPDBObject{
+class Trainingdate extends WPDBObject{
 	// TODO
 	private $abgesagt = false;
 }
