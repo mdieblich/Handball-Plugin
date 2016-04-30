@@ -1,7 +1,7 @@
 <?php
 namespace handball;
 
-class Spielposition{
+class Position{
 	private $bezeichnung;
 	private $abkuerzung;
 	
@@ -38,11 +38,11 @@ class Spielposition{
 	
 }
 
-Spielposition::$TORWART = new Spielposition("Torwart", "TW");
-Spielposition::$LINKS_AUSSEN = new Spielposition("Links außen", "LA");
-Spielposition::$RUECKRAUM_LINKS = new Spielposition("Rückraum links", "RL");
-Spielposition::$MITTE = new Spielposition("Mitte", "RM");
-Spielposition::$RUECKRAUM_RECHTS = new Spielposition("Rückraum rechts", "RR");
-Spielposition::$RECHTS_AUSSEN = new Spielposition("Rechts außen", "RA");
-Spielposition::$KREIS = new Spielposition("Kreis", "KR");
+Position::$TORWART = new Position("Torwart", "TW");
+Position::$LINKS_AUSSEN = new Position("Links außen", "LA");
+Position::$RUECKRAUM_LINKS = new Position("Rückraum links", "RL");
+Position::$MITTE = new Position("Mitte", "RM");
+Position::$RUECKRAUM_RECHTS = new Position("Rückraum rechts", "RR");
+Position::$RECHTS_AUSSEN = new Position("Rechts außen", "RA");
+Position::$KREIS = new Position("Kreis", "KR");
 ?>

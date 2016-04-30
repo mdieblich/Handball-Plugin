@@ -2,7 +2,7 @@
 
 namespace handball;
 
-require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Spielposition.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Position.php');
 
 class Player{
 	
@@ -46,7 +46,7 @@ class Player{
 			</th>
 			<td>
 				<fieldset><?php 
-					foreach(Spielposition::alle_positionen() as $position){
+					foreach(Position::alle_positionen() as $position){
 						$abkuerzung = $position->get_abkuerzung();
 						$bezeichnung = $position->get_bezeichnung();
 						$checked = $this->plays_on_position($position)?'checked':'';
@@ -73,7 +73,7 @@ class Player{
 	
 	private function load_positionen(){
 		$this->positionen = array();
-		foreach (Spielposition::alle_positionen() as $position){
+		foreach (Position::alle_positionen() as $position){
 			if($this->get_meta($position->get_meta_name())){
 				$this->positionen[] = $position;
 			}	
@@ -85,20 +85,20 @@ class Player{
 	}
 	
 	public function plays_position($position){
-		if(! ($position instanceof Spielposition) ){
+		if(! ($position instanceof Position) ){
 			throw new \Exception($position.' ist keine Spielposition');	
 		}
-		$this->ensure_spielposition($position);
+		$this->ensure_position($position);
 		if(!$this->plays_on_position($position)){
 			$this->positionen[] = $position;
 		}
 	}
 	
 	public function does_not_play_on_position($position){
-		if(! ($position instanceof Spielposition) ){
+		if(! ($position instanceof Position) ){
 			throw new \Exception($position.' ist keine Spielposition');	
 		}
-		$this->ensure_spielposition($position);
+		$this->ensure_position($position);
 		if(is_null($this->positionen)){
 			$this->load_positionen();
 		}
@@ -107,8 +107,8 @@ class Player{
 		}
 	}
 	
-	private function ensure_spielposition($position){
-		if(! ($position instanceof Spielposition)){
+	private function ensure_position($position){
+		if(! ($position instanceof Position)){
 			ob_start();
 			throw new Exception("Position ist murks: " + $ob_get_clean());
 		}
@@ -125,7 +125,7 @@ class Player{
 	}
 	
 	private function get_position_from_post(){
-		foreach(Spielposition::alle_positionen() as $position){
+		foreach(Position::alle_positionen() as $position){
 			$abkuerzung = $position->get_abkuerzung();
 			$position_field_name = 'position_'.$abkuerzung;
 			if(isset($_POST[$position_field_name])){
@@ -147,7 +147,7 @@ class Player{
 	
 	private function save_positionen(){
 		var_dump($this->positionen);
-		foreach(Spielposition::alle_positionen() as $position){
+		foreach(Position::alle_positionen() as $position){
 			if($this->plays_on_position($position)){
 				$this->set_meta($position->get_meta_name(), true);
 			}else{
