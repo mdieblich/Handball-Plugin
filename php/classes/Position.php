@@ -2,24 +2,24 @@
 namespace handball;
 
 class Position{
-	private $bezeichnung;
-	private $abkuerzung;
+	private $name;
+	private $abbreviation;
 	
-	function __construct($bezeichnung, $abkuerzung){
-		$this->bezeichnung = $bezeichnung;
-		$this->abkuerzung = $abkuerzung;
+	function __construct($name, $abbreviation){
+		$this->name = $name;
+		$this->abbreviation = $abbreviation;
 	}
 	
-	public function get_bezeichnung(){
-		return $this->bezeichnung;
+	public function get_name(){
+		return $this->name;
 	}
 	
-	public function get_abkuerzung(){
-		return $this->abkuerzung;
+	public function get_abbreviation(){
+		return $this->abbreviation;
 	}
 	
 	public function get_meta_name(){
-		return 'Position_'.$this->get_abkuerzung();
+		return 'Position_'.$this->get_abbreviation();
 	}
 	
 	public static $TORWART, $LINKS_AUSSEN, $RUECKRAUM_LINKS, $MITTE, $RUECKRAUM_RECHTS, $RECHTS_AUSSEN, $KREIS;

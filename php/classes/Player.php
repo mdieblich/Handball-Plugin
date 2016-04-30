@@ -47,8 +47,8 @@ class Player{
 			<td>
 				<fieldset><?php 
 					foreach(Position::alle_positionen() as $position){
-						$abbreviation = $position->get_abkuerzung();
-						$name = $position->get_bezeichnung();
+						$abbreviation = $position->get_abbreviation();
+						$name = $position->get_name();
 						$checked = $this->plays_on_position($position)?'checked':'';
 						$disabled = $enabled ? "":"disabled";
 						echo '<label for="'.$abbreviation.'">';
