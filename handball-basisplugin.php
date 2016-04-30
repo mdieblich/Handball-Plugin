@@ -31,11 +31,11 @@ add_action( 'edit_user_profile', 'handball\show_extra_profile_fields' );
 function activate(){
 	require_once 'classes/Handballer.php';
 	require_once 'classes/Mannschaft.php';
-	require_once 'classes/Halle.php';
+	require_once 'classes/Location.php';
 	require_once 'classes/Trainingszeit.php';
 	
 	Mannschaft::install();
-	Halle::install();
+	Location::install();
 	Trainingszeit::install();
 }
 

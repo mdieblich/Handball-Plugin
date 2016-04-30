@@ -28,7 +28,7 @@ class ManageTrainingTimes{
 	}
 	
 	public function create_manage_training_times_page(){
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Halle.php');
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Location.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Mannschaft.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Team_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Hall_Select.php');
@@ -70,7 +70,7 @@ class ManageTrainingTimes{
 		
 		echo "<h3>Hallen</h3>";
 		echo "<strong>Hinweis:</strong> Hallen können (noch) nicht geändert, nur gelöscht werden.<br><br>";
-		$alle_hallen = \handball\Halle::get_all ();
+		$alle_hallen = \handball\Location::get_all ();
 		$alle_mannschaften = \handball\Mannschaft::get_all ();
 		?>
 		<script type="text/javascript">
@@ -95,7 +95,7 @@ class ManageTrainingTimes{
             };
             <?php 
             // erstellen der Event-Sources für alle zugewiesenen Hallenzeiten
-			require_once (HANDBASE_PLUGIN_DIR . '/classes/Halle.php');
+			require_once (HANDBASE_PLUGIN_DIR . '/classes/Location.php');
             foreach($alle_hallen as $halle){
             	echo 'var '
 					.$halle->get_fullcalendar_io_event_source_name()

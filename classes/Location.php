@@ -3,7 +3,7 @@
 namespace handball;
 require_once 'WPDBObject.php';
 
-class Halle extends WPDBObject{
+class Location extends WPDBObject{
 	private $name;
 	private $abkuerzung;
 	private $adresse;
@@ -64,7 +64,7 @@ class Halle extends WPDBObject{
 	}
 	
 	protected static function row_to_object($row_object){
-		return new Halle($row_object->name, $row_object->abkuerzung, $row_object->adresse, $row_object->color, $row_object->id);
+		return new Location($row_object->name, $row_object->abkuerzung, $row_object->adresse, $row_object->color, $row_object->id);
 	}
 	
 	public function get_fullcalendar_io_event_source_name(){

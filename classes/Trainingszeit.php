@@ -50,7 +50,7 @@ class Trainingszeit extends WPDBObject{
 			  hinweis text NULL,
 			  PRIMARY KEY (id),
  			  FOREIGN KEY (mannschaft) REFERENCES ".Mannschaft::table_name()."(id),
- 			  FOREIGN KEY (halle) REFERENCES ".Halle::table_name()."(id)
+ 			  FOREIGN KEY (halle) REFERENCES ".Location::table_name()."(id)
 		) ".$charset_collate.";";
 	
 		dbDelta( $sql );
