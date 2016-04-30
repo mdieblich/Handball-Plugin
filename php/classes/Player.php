@@ -8,7 +8,7 @@ class Player{
 	
 	private $id;
 	/** Auf welcher Position spielt dieser Spieler? */
-	private $positionen;
+	private $positions;
 	
 	public function __construct($user_id){
 		if(!is_int($user_id)){
@@ -47,13 +47,13 @@ class Player{
 			<td>
 				<fieldset><?php 
 					foreach(Position::alle_positionen() as $position){
-						$abkuerzung = $position->get_abkuerzung();
-						$bezeichnung = $position->get_bezeichnung();
+						$abbreviation = $position->get_abkuerzung();
+						$name = $position->get_bezeichnung();
 						$checked = $this->plays_on_position($position)?'checked':'';
 						$disabled = $enabled ? "":"disabled";
-						echo '<label for="'.$abkuerzung.'">';
-						echo '<input type="checkbox" name="position_'.$abkuerzung.'" value="true" id="'.$abkuerzung.'" '.$checked.' '.$disabled.'>';
-						echo $bezeichnung.' </label>'; 
+						echo '<label for="'.$abbreviation.'">';
+						echo '<input type="checkbox" name="position_'.$abbreviation.'" value="true" id="'.$abbreviation.'" '.$checked.' '.$disabled.'>';
+						echo $name.' </label>'; 
 					}
 				?></fieldset>
 				<span class="description">
@@ -65,17 +65,17 @@ class Player{
 		
 	
 	public function plays_on_position($position){
-		if(is_null($this->positionen)){
-			$this->load_positionen();
+		if(is_null($this->positions)){
+			$this->load_positions();
 		}
-		return in_array($position, $this->positionen);
+		return in_array($position, $this->positions);
 	}
 	
-	private function load_positionen(){
-		$this->positionen = array();
+	private function load_positions(){
+		$this->positions = array();
 		foreach (Position::alle_positionen() as $position){
 			if($this->get_meta($position->get_meta_name())){
-				$this->positionen[] = $position;
+				$this->positions[] = $position;
 			}	
 		}
 	}
@@ -90,7 +90,7 @@ class Player{
 		}
 		$this->ensure_position($position);
 		if(!$this->plays_on_position($position)){
-			$this->positionen[] = $position;
+			$this->positions[] = $position;
 		}
 	}
 	
@@ -99,11 +99,11 @@ class Player{
 			throw new \Exception($position.' ist keine Spielposition');	
 		}
 		$this->ensure_position($position);
-		if(is_null($this->positionen)){
-			$this->load_positionen();
+		if(is_null($this->positions)){
+			$this->load_positions();
 		}
-		if(($key = array_search($position, $this->positionen)) !== false) {
-			unset($this->positionen[$key]);
+		if(($key = array_search($position, $this->positions)) !== false) {
+			unset($this->positions[$key]);
 		}
 	}
 	
@@ -126,8 +126,8 @@ class Player{
 	
 	private function get_position_from_post(){
 		foreach(Position::alle_positionen() as $position){
-			$abkuerzung = $position->get_abkuerzung();
-			$position_field_name = 'position_'.$abkuerzung;
+			$abbreviation = $position->get_abkuerzung();
+			$position_field_name = 'position_'.$abbreviation;
 			if(isset($_POST[$position_field_name])){
 				$plays_on_position = $_POST[$position_field_name];
 				if($plays_on_position){
@@ -142,11 +142,11 @@ class Player{
 	}
 	
 	public function save(){
-		$this->save_positionen();
+		$this->save_positions();
 	}
 	
-	private function save_positionen(){
-		var_dump($this->positionen);
+	private function save_positions(){
+		var_dump($this->positions);
 		foreach(Position::alle_positionen() as $position){
 			if($this->plays_on_position($position)){
 				$this->set_meta($position->get_meta_name(), true);
