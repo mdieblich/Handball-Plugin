@@ -29,7 +29,7 @@ class ManageTrainingTimes{
 	
 	public function create_manage_training_times_page(){
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Location.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Mannschaft.php');
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Team.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Team_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Location_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Weekday_Select.php');
@@ -71,7 +71,7 @@ class ManageTrainingTimes{
 		echo "<h3>Trainingsorte</h3>";
 		echo "<strong>Hinweis:</strong> Trainingsorte können (noch) nicht geändert, nur gelöscht werden.<br><br>";
 		$all_locations = \handball\Location::get_all ();
-		$alle_mannschaften = \handball\Mannschaft::get_all ();
+		$all_teams = \handball\Team::get_all ();
 		?>
 		<script type="text/javascript">
         // siehe http://fullcalendar.io/docs/
@@ -117,8 +117,8 @@ class ManageTrainingTimes{
             var teamVisibility = new Array();
             teamVisibility["Kein Team"] = true;
 <?php 
-            foreach($alle_mannschaften as $mannschaft){
-            	echo "            teamVisibility[\"".$mannschaft->get_name()."\"] = true;\n";
+            foreach($all_teams as $team){
+            	echo "            teamVisibility[\"".$team->get_name()."\"] = true;\n";
 			}
 ?>
             function toggleTeam(teamName, visible){
@@ -203,7 +203,7 @@ class ManageTrainingTimes{
                     $('#calendar').fullCalendar('updateEvent', event);
                     $('#edit_id').val(event.id);
                     $('#delete_id').val(event.id);
-                    $('#edit_mannschaft').val(event.mannschaft);
+                    $('#edit_team_id').val(event.team_id);
                     $('#edit_location_id').val(event.location_id);
                     $('#edit_comment').val(event.comment);
                 }
@@ -346,12 +346,12 @@ class ManageTrainingTimes{
         		<input type="checkbox" id="checkbox_location_unassigned" value="(ohne Trainingsort)" onchange="toggleLocation(trainingTimesWithoutLocation, this.checked)" checked>
         	</span>
         </div>
-        <div id="mannschaften" style="max-width:900px; margin: 0.8em 2em;">
+        <div id="teams" style="max-width:900px; margin: 0.8em 2em;">
             Folgende <b>Mannschaften</b> anzeigen:<br>
-	        <?php foreach($alle_mannschaften as $mannschaft){
-	            $checkbox_id = 'mannschaft_'.$mannschaft->get_id();
-	            echo '<span style="padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$mannschaft->get_name().'</label>';
-	            echo '<input type="checkbox" id="'.$checkbox_id.'" value="'.$checkbox_id.'" onchange="toggleTeam(\''.$mannschaft->get_name().'\', this.checked);" checked></span>';
+	        <?php foreach($all_teams as $team){
+	            $checkbox_id = 'checkbox_team_'.$team->get_id();
+	            echo '<span style="padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$team->get_name().'</label>';
+	            echo '<input type="checkbox" id="'.$checkbox_id.'" value="'.$checkbox_id.'" onchange="toggleTeam(\''.$team->get_name().'\', this.checked);" checked></span>';
 	        } ?>
 	        <span style="padding: 3px; margin: 5px;">
         		<label for="checkboxNoTeam"><i>(Kein Team)</i>&nbsp;</label>
@@ -362,7 +362,7 @@ class ManageTrainingTimes{
             <b>Aktuell ausgewählt:</b><br>
             <form method="post">
             <?php
-            	echo \handball\input\team_select('team_id', 'edit_mannschaft'); 
+            	echo \handball\input\team_select('team_id', 'edit_team_id'); 
             	echo \handball\input\location_Select('location_id', 'edit_location_id');
             ?>
             <br>

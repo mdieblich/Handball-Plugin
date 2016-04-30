@@ -7,7 +7,7 @@ require_once 'Handballer.php';
 /**
  * TODO Datenbank-Schema-Upgrade: https://codex.wordpress.org/Creating_Tables_with_Plugins
  */
-class Mannschaft extends WPDBObject{
+class Team extends WPDBObject{
 	
 	private $id;
 	
@@ -16,13 +16,10 @@ class Mannschaft extends WPDBObject{
 	private $trainer;
 	private $cotrainer;
 	/** Kern der Mannschaft */
-	private $stammspieler; // 1xN Relation (ein Spieler kann höchstens in einer Mannschaft sein)
-	
-	/** Anfragen einzelner Spieler, teil der Mannschaft zu werden */
-	private $spieleranfragen; // 1xN Relation (ein Spieler kann nur einer neuen Mannschaft beitreten)
+	private $main_players; // 1xN Relation (ein Spieler kann höchstens in einer Mannschaft sein)
 	
 	/** Hier kann sich jeder selbst eintragen */
-	private $zusatzspieler; // NxM Relation (ein Spieler kann beliebig viele Mannschaften "abonnieren")
+	private $additional_players; // NxM Relation (ein Spieler kann beliebig viele Mannschaften "abonnieren")
 	
 	public function __construct($name, $trainer = null, $cotrainer=null, $id=null){
 		$this->name = $name;
@@ -51,18 +48,18 @@ class Mannschaft extends WPDBObject{
 	}
 	
 	public function is_stammspieler($user){
-		if(is_null($this->stammspieler)){
+		if(is_null($this->main_players)){
 			$this->load_stammspieler();
 		}
-		return in_array($user->ID, $this->stammspieler);
+		return in_array($user->ID, $this->main_players);
 	}
 	
 	private function load_stammspieler(){
 		global $wpdb;
 		$sql = "SELECT user FROM ". static::table_stammspieler()." WHERE team=".$this->get_id();
-		$this->stammspieler = array();
+		$this->main_players = array();
 		foreach($wpdb->get_results($sql) as $stammspieler_id){
-			$this->stammspieler[] = $stammspieler_id->user;
+			$this->main_players[] = $stammspieler_id->user;
 		}
 	}
 	
@@ -81,21 +78,21 @@ class Mannschaft extends WPDBObject{
 						'user' => $user->ID
 				)
 		);
-		$this->stammspieler[] = $user->ID;
+		$this->main_players[] = $user->ID;
 	}
 	
 	public function is_zusatzspieler($user){
-		if(is_null($this->zusatzspieler)){
+		if(is_null($this->additional_players)){
 			$this->load_zusatzspieler();
 		}
-		return in_array($user->ID, $this->zusatzspieler);
+		return in_array($user->ID, $this->additional_players);
 	}
 	private function load_zusatzspieler(){
 		global $wpdb;
 		$sql = "SELECT user FROM ". static::table_zusatzspieler()." WHERE team=".$this->get_id();
-		$this->zusatzspieler = array();
+		$this->additional_players = array();
 		foreach($wpdb->get_results($sql) as $zusatzspieler_id){
-			$this->zusatzspieler[] = $zusatzspieler_id->user;
+			$this->additional_players[] = $zusatzspieler_id->user;
 		}
 	}
 	public function add_zusatzspieler($user){
@@ -110,7 +107,7 @@ class Mannschaft extends WPDBObject{
 						'user' => $user->ID
 				)
 		);
-		$this->zusatzspieler[] = $user->ID;
+		$this->additional_players[] = $user->ID;
 	}
 
 	public static function add_stammspieler_to_team($team_id, $user_id){
@@ -180,14 +177,14 @@ class Mannschaft extends WPDBObject{
 	}
 
 	public static function table_stammspieler(){
-		return static::table_name().'_stammspieler';
+		return static::table_name().'_main_players';
 	}
 	public static function table_zusatzspieler(){
-		return static::table_name().'_zusatzspieler';
+		return static::table_name().'_additional_players';
 	}
 	
 	protected static function row_to_object($row_object){
-		return new Mannschaft(
+		return new Team(
 				$row_object->name, 
 				intval($row_object->trainer), 
 				intval($row_object->cotrainer), 
@@ -197,18 +194,18 @@ class Mannschaft extends WPDBObject{
 	
 
 	/** Brauchbar als Ajax-Callbackfunction */
-	public static function set_trainer($mannschaft_id, $user_id){
+	public static function set_trainer($team_id, $user_id){
 		global $wpdb;
-		$wpdb->update(static::table_name(), array('trainer' => $user_id), array('id' => $mannschaft_id));
-		$row = $wpdb->get_row( 'SELECT trainer FROM '.static::table_name().' WHERE id = '.$mannschaft_id );
+		$wpdb->update(static::table_name(), array('trainer' => $user_id), array('id' => $team_id));
+		$row = $wpdb->get_row( 'SELECT trainer FROM '.static::table_name().' WHERE id = '.$team_id );
 		return $row->trainer;
 	}
 	
 	/** Brauchbar als Ajax-Callbackfunction */
-	public static function set_cotrainer($mannschaft_id, $user_id){
+	public static function set_cotrainer($team_id, $user_id){
 		global $wpdb;
-		$wpdb->update(static::table_name(), array('cotrainer' => $user_id), array('id' => $mannschaft_id));
-		$row = $wpdb->get_row( 'SELECT cotrainer FROM '.static::table_name().' WHERE id = '.$mannschaft_id );
+		$wpdb->update(static::table_name(), array('cotrainer' => $user_id), array('id' => $team_id));
+		$row = $wpdb->get_row( 'SELECT cotrainer FROM '.static::table_name().' WHERE id = '.$team_id );
 		return $row->cotrainer;
 	}
 }

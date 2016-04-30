@@ -30,18 +30,18 @@ add_action( 'edit_user_profile', 'handball\show_extra_profile_fields' );
 
 function activate(){
 	require_once 'classes/Handballer.php';
-	require_once 'classes/Mannschaft.php';
+	require_once 'classes/Team.php';
 	require_once 'classes/Location.php';
 	require_once 'classes/Trainingszeit.php';
 	
-	Mannschaft::install();
+	Team::install();
 	Location::install();
 	Trainingszeit::install();
 }
 
 function deactivate(){
-// 	require_once 'classes/Mannschaft.php';
-// 	Mannschaft::uninstall();
+// 	require_once 'classes/Team.php';
+// 	Team::uninstall();
 }
 
 function show_extra_profile_fields( $user ) {

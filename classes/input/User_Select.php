@@ -29,7 +29,7 @@ function select_multiple_users($team){
 	wp_enqueue_script('multiselect-team', plugins_url('/handball-basisplugin/javascript/multiselect-team.js'), array('multiselect'));
 	?>
 	<script type="text/javascript">
-	var teamid=<?php echo $team->get_id(); ?>;
+	var team_id=<?php echo $team->get_id(); ?>;
 	</script>
 	<div style="float:left;">
 		Alle Spieler<br>

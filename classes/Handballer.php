@@ -9,15 +9,6 @@ class Handballer{
 	/** Auf welcher Position spielt dieser Spieler? */
 	private $positionen;
 	
-	/** Hauptmannschaft, in der man drin ist */
-	private $stammmanschaft;
-	
-	/** Mannschaft, in die man rein möchte (überschreibt stammmannschaft) */
-	private $wunschmannschaft;
-	
-	/** Mannschaften, die man "abonniert" hat */
-	private $zusatzmannschaften;
-	
 	public function __construct($user_id){
 		if(!is_int($user_id)){
 			throw new \Exception($user_id.' ist kein Integer.');
@@ -37,8 +28,8 @@ class Handballer{
 		<table class="form-table">
 			<?php
 				$this->show_position_checkboxes ();
-				$this->list_stammmannschaften ();
-				$this->list_zusatzmannschaften ();
+				$this->list_main_teams ();
+				$this->list_additional_teams ();
 			?>
 		</table>
 		<?php
@@ -171,51 +162,51 @@ class Handballer{
 		delete_user_meta( $this->id, $key );
 	}
 
-	public function get_stammmannschaften(){
+	public function get_main_teams(){
 		$teams = array();
 
 		global $wpdb;
-		$sql = "SELECT team FROM ". Mannschaft::table_stammspieler()." WHERE user=$this->id";
+		$sql = "SELECT team FROM ". Team::table_stammspieler()." WHERE user=$this->id";
 		foreach($wpdb->get_results($sql) as $row){
-			$teams[] = Mannschaft::get_by_id($row->team);
+			$teams[] = Team::get_by_id($row->team);
 		}
 		
 		return $teams;
 	}
-	public function get_zusatzmannschaften(){
+	public function get_additional_teams(){
 		$teams = array();
 
 		global $wpdb;
-		$sql = "SELECT team FROM ". Mannschaft::table_zusatzspieler()." WHERE user=$this->id";
+		$sql = "SELECT team FROM ". Team::table_zusatzspieler()." WHERE user=$this->id";
 		foreach($wpdb->get_results($sql) as $row){
-			$teams[] = Mannschaft::get_by_id($row->team);
+			$teams[] = Team::get_by_id($row->team);
 		}
 		
 		return $teams;
 	}
-	public function list_stammmannschaften(){
+	public function list_main_teams(){
 		?><tr>
 			<th>
-				<label for="stammmannschaft">Stammmannschaften</label>
+				<label for="additional_teams">Stammmannschaften</label>
 			</th>
 			<td>
 				<?php 
-				foreach ($this->get_stammmannschaften() as $stammmannschaft){
-					echo $stammmannschaft->get_name()."<br>";	
+				foreach ($this->get_main_teams() as $main_team){
+					echo $main_team->get_name()."<br>";	
 				}
 				?>
 			</td>
 		</tr><?php 
 	}
-	public function list_zusatzmannschaften(){
+	public function list_additional_teams(){
 		?><tr>
 			<th>
-				<label for="zusatzmannschaft">Weitere Mannschaften</label>
+				<label for="additional_teams">Weitere Mannschaften</label>
 			</th>
 			<td>
 				<?php
-				foreach ($this->get_zusatzmannschaften() as $zusatzmannschaft){
-					echo $zusatzmannschaft->get_name()."<br>";
+				foreach ($this->get_additional_teams() as $additional_team){
+					echo $additional_team->get_name()."<br>";
 				}
 				?>
 			</td>

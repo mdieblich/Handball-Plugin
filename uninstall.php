@@ -4,7 +4,7 @@ if ( !defined( 'WP_UNINSTALL_PLUGIN' ) ){
 	exit();
 }
 
-require_once 'classes/Mannschaft.php';
-handball\Mannschaft::uninstall();
+require_once 'classes/Team.php';
+handball\Team::uninstall();
 	
 ?>

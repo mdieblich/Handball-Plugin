@@ -2,9 +2,9 @@
 
 namespace handball\menu;
 
-require_once (ABSPATH . 'wp-content/plugins/handball-basisplugin/classes/Mannschaft.php');
+require_once (ABSPATH . 'wp-content/plugins/handball-basisplugin/classes/Team.php');
 class CreateTeamPage {
-	private static $MENU_SLUG = 'handball_mannschaft';
+	private static $MENU_SLUG = 'handball_create_team';
 	public function __construct() {
 		add_action ( 'admin_menu', array (
 				$this,
@@ -26,25 +26,25 @@ class CreateTeamPage {
 
 	}
 	public function create_team_page() {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Mannschaft.php');
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Team.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/User_Select.php');
 		
 		if (isset ( $_POST ['createTeam'] )) {
-			$mannschaft = new \handball\Mannschaft ( $_POST ['Teamname'], intval($_POST ['Trainer']), intval($_POST ['Cotrainer']) );
+			new \handball\Team ( $_POST ['Teamname'], intval($_POST ['Trainer']), intval($_POST ['Cotrainer']) );
 		}
 		
-		if (isset ( $_GET ['delete'] )) {
-			$delete_id = intval ( $_GET ['delete'] );
-			\handball\Mannschaft::delete ( $delete_id );
+		if (isset ( $_GET ['delete_team_id'] )) {
+			$delete_id = intval ( $_GET ['delete_team_id'] );
+			\handball\Team::delete ( $delete_id );
 		}
 		
 		?>
 <script type="text/javascript">
-function setAsTrainer(mannschaftID, nutzerID){
+function setAsTrainer(teamID, nutzerID){
 	var data = {
 		'action': 'set_trainer',
-		'team': mannschaftID,
-		'user': nutzerID
+		'team_id': teamID,
+		'user_id': nutzerID
 	};
 	
 	// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
@@ -54,11 +54,11 @@ function setAsTrainer(mannschaftID, nutzerID){
 		}
 	});
 }
-function setAsCotrainer(mannschaftID, nutzerID){
+function setAsCotrainer(teamID, nutzerID){
 	var data = {
 		'action': 'set_cotrainer',
-		'team': mannschaftID,
-		'user': nutzerID
+		'team_id': teamID,
+		'user_id': nutzerID
 	};
 	
 	// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
@@ -81,7 +81,7 @@ function setAsCotrainer(mannschaftID, nutzerID){
             </th>
         </tr>
 	            	<?php
-		$all_teams = \handball\Mannschaft::get_all ();
+		$all_teams = \handball\Team::get_all ();
 		foreach ( $all_teams as $team ) {
 			?>
 			        	<tr>
@@ -89,7 +89,7 @@ function setAsCotrainer(mannschaftID, nutzerID){
             <td><?php echo \handball\input\select_user('Trainer', 'setAsTrainer('.$team->get_id().',this.value)', $team->get_trainer()->get_id()); ?></td>
             <td><?php echo \handball\input\select_user('Cotrainer','setAsCotrainer('.$team->get_id().',this.value)', $team->get_cotrainer()->get_id()); ?></td>
             <td><a
-                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&delete=<?php echo $team->get_id(); ?>">Löschen</a></td>
+                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&delete_team_id=<?php echo $team->get_id(); ?>">Löschen</a></td>
         </tr>
 			        	<?php
 		}
@@ -126,15 +126,15 @@ function setAsCotrainer(mannschaftID, nutzerID){
 		wp_die (); // this is required to terminate immediately and return a proper response
 	}
 	public static function set_trainer() {
-		$mannschaft_id = intval ( $_POST ['team'] );
-		$user_id = intval ( $_POST ['user'] );
-		echo \handball\Mannschaft::set_trainer ( $mannschaft_id, $user_id );
+		$team_id = intval ( $_POST ['team_id'] );
+		$user_id = intval ( $_POST ['user_id'] );
+		echo \handball\Team::set_trainer ( $team_id, $user_id );
 		wp_die ();
 	}
 	public static function set_cotrainer() {
-		$mannschaft_id = intval ( $_POST ['team'] );
-		$user_id = intval ( $_POST ['user'] );
-		echo \handball\Mannschaft::set_cotrainer ( $mannschaft_id, $user_id );
+		$team_id = intval ( $_POST ['team_id'] );
+		$user_id = intval ( $_POST ['user_id'] );
+		echo \handball\Team::set_cotrainer ( $team_id, $user_id );
 		wp_die ();
 	}
 }

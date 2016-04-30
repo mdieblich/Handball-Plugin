@@ -85,53 +85,53 @@ jQuery(document).ready(function($) {
         }
     });
 });
-function addStammspieler(nutzerID){
+function addStammspieler(user_id){
     var data = {
             'action': 'add_stammspieler',
-            'team': teamid,
-            'user': nutzerID
+            'team_id': team_id,
+            'user_id': user_id
     };
     jQuery.post(ajaxurl, data, function(response) {
-        if(response != nutzerID){
-            alert("Der Stammspieler konnte nicht hinzugefügt werden: " + response + " statt " + nutzerID);
+        if(response != user_id){
+            alert("Der Stammspieler konnte nicht hinzugefügt werden: " + response + " statt " + user_id);
         }
     });
 }
-function removeStammspieler(nutzerID){
+function removeStammspieler(user_id){
     var data = {
             'action': 'remove_stammspieler',
-            'team': teamid,
-            'user': nutzerID
+            'team_id': team_id,
+            'user_id': user_id
     };
     jQuery.post(ajaxurl, data, function(response) {
-        if(response != nutzerID){
-            alert("Der Stammspieler konnte nicht entfernt werden: " + response + " statt " + nutzerID);
+        if(response != user_id){
+            alert("Der Stammspieler konnte nicht entfernt werden: " + response + " statt " + user_id);
         }
     });
 }
-function addZusatzspieler(nutzerID){
+function addZusatzspieler(user_id){
     var data = {
             'action': 'add_zusatzspieler',
-            'team': teamid,
-            'user': nutzerID
+            'team_id': team_id,
+            'user_id': user_id
     };
 
     jQuery.post(ajaxurl, data, function(response) {
-        if(response != nutzerID){
-            alert("Der Stammspieler konnte nicht hinzugefügt werden: " + response + " statt " + nutzerID);
+        if(response != user_id){
+            alert("Der Stammspieler konnte nicht hinzugefügt werden: " + response + " statt " + user_id);
         }
     });
 }
-function removeZusatzspieler(nutzerID){
+function removeZusatzspieler(user_id){
     var data = {
             'action': 'remove_zusatzspieler',
-            'team': teamid,
-            'user': nutzerID
+            'team_id': team_id,
+            'user_id': user_id
     };
 
     jQuery.post(ajaxurl, data, function(response) {
-        if(response != nutzerID){
-            alert("Der Stammspieler konnte nicht entfernt werden: " + response + " statt " + nutzerID);
+        if(response != user_id){
+            alert("Der Stammspieler konnte nicht entfernt werden: " + response + " statt " + user_id);
         }
     });
 }

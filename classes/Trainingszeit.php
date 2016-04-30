@@ -4,7 +4,7 @@ require_once 'WPDBObject.php';
 
 class Trainingszeit extends WPDBObject{
 	
-	private $mannschaft;
+	private $team;
 	
 	private $location;
 	private $wochentag;
@@ -13,8 +13,8 @@ class Trainingszeit extends WPDBObject{
 	
 	private $hinweis;
 	
-	public function __construct($wochentag, $uhrzeit, $dauer, $location=null, $mannschaft=null, $hinweis="", $id=null){
-		$this->mannschaft = $mannschaft;
+	public function __construct($wochentag, $uhrzeit, $dauer, $location=null, $team=null, $hinweis="", $id=null){
+		$this->team = $team;
 		$this->location = $location;
 		$this->wochentag = $wochentag;
 		$this->uhrzeit = $uhrzeit;
@@ -25,7 +25,7 @@ class Trainingszeit extends WPDBObject{
 	
 	protected function to_array(){
 		$array = parent::to_array();
-		$array['mannschaft'] = static::as_id($this->mannschaft);
+		$array['team'] = static::as_id($this->team);
 		$array['location'] = static::as_id($this->location);
 		$array['wochentag'] = $this->wochentag;
 		$array['uhrzeit'] = $this->uhrzeit;
@@ -42,14 +42,14 @@ class Trainingszeit extends WPDBObject{
 		$sql =
 		"CREATE TABLE ".static::table_name()." (
 			  id mediumint(9) NOT NULL AUTO_INCREMENT,
-			  mannschaft mediumint(9) unsigned,
+			  team mediumint(9) unsigned,
 			  location mediumint(9) unsigned,
 			  wochentag ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'),
 			  uhrzeit char(5) NOT NULL,
 			  dauer int NOT NULL,
 			  hinweis text NULL,
 			  PRIMARY KEY (id),
- 			  FOREIGN KEY (mannschaft) REFERENCES ".Mannschaft::table_name()."(id),
+ 			  FOREIGN KEY (team) REFERENCES ".Team::table_name()."(id),
  			  FOREIGN KEY (location) REFERENCES ".Location::table_name()."(id)
 		) ".$charset_collate.";";
 	
@@ -61,7 +61,7 @@ class Trainingszeit extends WPDBObject{
 				$row_object->uhrzeit, 
 				$row_object->dauer, 
 				$row_object->location, 
-				$row_object->mannschaft, 
+				$row_object->team, 
 				$row_object->hinweis, 
 				$row_object->id);
 	}
@@ -81,7 +81,7 @@ class Trainingszeit extends WPDBObject{
 	}
 	
 	private function to_fullcalendar_io_event(){
-		$teamname = is_null($this->mannschaft) ? 'Kein Team' : Mannschaft::get_by_id($this->mannschaft)->get_name();
+		$teamname = is_null($this->team) ? 'Kein Team' : Team::get_by_id($this->team)->get_name();
 		return 
 			"{\n"
 				."id: ".$this->get_id().",\n"
@@ -89,7 +89,7 @@ class Trainingszeit extends WPDBObject{
 				.'start: \''.$this->get_start_in_current_week()."',\n"
 				.'end: \''.$this->get_end_in_current_week()."',\n"
 				.'location_id: \''.$this->location."',\n"
-				.'mannschaft: \''.$this->mannschaft."',\n"
+				.'team_id: \''.$this->team."',\n"
 				.'comment: \''.$this->hinweis."'\n"
 			.'}';
 	}
@@ -124,7 +124,7 @@ class Trainingszeit extends WPDBObject{
 		$this->dauer = $dauer;
 	}
 	public function set_team($team_id){
-		$this->mannschaft = $team_id;
+		$this->team = $team_id;
 	}
 	public function set_location($location_id){
 		$this->location = $location_id;
