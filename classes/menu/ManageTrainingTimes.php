@@ -31,7 +31,7 @@ class ManageTrainingTimes{
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Location.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Mannschaft.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Team_Select.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Hall_Select.php');
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Location_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Weekday_Select.php');
 		if (isset ( $_POST ['createHall'] )) {
 			$neue_halle = new \handball\Halle( 
@@ -363,7 +363,7 @@ class ManageTrainingTimes{
             <form method="post">
             <?php
             	echo \handball\input\team_select('team_id', 'edit_mannschaft'); 
-            	echo \handball\input\hall_select('hall_id', 'edit_halle');
+            	echo \handball\input\location_Select('hall_id', 'edit_halle');
             ?>
             <br>
             <b>Trainingshinweis:</b><br>

@@ -2,7 +2,7 @@
 namespace handball\input;
 
 use handball\Location;
-function hall_select($name, $html_id=null, $onchange=null, $select=-1){
+function location_select($name, $html_id=null, $onchange=null, $select=-1){
 	$onchange = (is_null($onchange)) ? '': 'onchange="'.$onchange.'"'; 
 	if($select == -1 && isset($_GET[$name])){
 		$select = $_GET[$name];
