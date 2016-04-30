@@ -3,7 +3,7 @@ namespace handball;
 
 require_once(HANDBASE_PLUGIN_DIR.'/php/classes/WPDBObject.php');
 
-class Trainingszeit extends WPDBObject{
+class Trainingtime extends WPDBObject{
 	
 	private $team;
 	
@@ -57,7 +57,7 @@ class Trainingszeit extends WPDBObject{
 		dbDelta( $sql );
 	}
 	protected static function row_to_object($row_object){
-		return new Trainingszeit(
+		return new Trainingtime(
 				$row_object->wochentag, 
 				$row_object->uhrzeit, 
 				$row_object->dauer, 
@@ -67,16 +67,16 @@ class Trainingszeit extends WPDBObject{
 				$row_object->id);
 	}
 	
-	public static function get_fullcalender_io_events($trainingszeiten){
-		if(!is_array($trainingszeiten)){
-			throw new \Exception('Trainingszeiten ist kein array: '.$trainingszeiten);
+	public static function get_fullcalender_io_events($trainingtimes){
+		if(!is_array($trainingtimes)){
+			throw new \Exception('Trainingszeiten ist kein array: '.$trainingtimes);
 		}
 		$fullcalendar_io_events = array();
-		foreach($trainingszeiten as $trainingszeit){
-			if(!($trainingszeit instanceof Trainingszeit)){
-				throw new \Exception('Element ('.$trainingszeit.') im Array ist keine Trainingszeit');
+		foreach($trainingtimes as $trainingtime){
+			if(!($trainingtime instanceof Trainingtime)){
+				throw new \Exception('Element ('.$trainingtime.') im Array ist keine Trainingszeit');
 			}
-			$fullcalendar_io_events[] = $trainingszeit->to_fullcalendar_io_event();
+			$fullcalendar_io_events[] = $trainingtime->to_fullcalendar_io_event();
 		}
 		return $fullcalendar_io_events;
 	}

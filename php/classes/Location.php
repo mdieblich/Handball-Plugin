@@ -68,16 +68,16 @@ class Location extends WPDBObject{
 		return 'trainingTimes'.$this->get_abkuerzung();
 	}
 	
-	public function get_trainingszeiten_as_fullcalendar_io_event_source(){
-		$fullcalender_events = Trainingszeit::get_fullcalender_io_events($this->get_trainingszeiten());
+	public function get_trainingtimes_as_fullcalendar_io_event_source(){
+		$fullcalender_events = Trainingtime::get_fullcalender_io_events($this->get_trainingtimes());
 		return 	"{\n"
 				."color: '".$this->get_color()."',\n"
 				.'events: ['.implode(", \n", $fullcalender_events)."]\n"
 				."\n}";
 	}
 	
-	private function get_trainingszeiten(){
-		return Trainingszeit::get('location='.$this->get_id());
+	private function get_trainingtimes(){
+		return Trainingtime::get('location='.$this->get_id());
 	}
 }
 ?>

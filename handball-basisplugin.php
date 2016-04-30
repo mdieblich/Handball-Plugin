@@ -31,11 +31,11 @@ add_action( 'edit_user_profile', 'handball\show_extra_profile_fields' );
 function activate(){
 	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Team.php');
 	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Location.php');
-	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Trainingszeit.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Trainingtime.php');
 	
 	Team::install();
 	Location::install();
-	Trainingszeit::install();
+	Trainingtime::install();
 }
 
 function deactivate(){
@@ -64,9 +64,9 @@ if( is_admin() ){
 	require_once (HANDBASE_PLUGIN_DIR . '/php/menu/Hauptmenu.php');
 	require_once (HANDBASE_PLUGIN_DIR . '/php/menu/CreateTeamPage.php');
 	require_once (HANDBASE_PLUGIN_DIR . '/php/menu/ManageTeamPage.php');
-	require_once (HANDBASE_PLUGIN_DIR . '/php/menu/ManageTrainingTimes.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/menu/ManageTrainingtimes.php');
 	new menu\Hauptmenu();
-	new menu\ManageTrainingTimes();
+	new menu\ManageTrainingtimes();
 	new menu\CreateTeamPage();
 	new menu\ManageTeamPage();
 	// TODO "mein Team"-Seite

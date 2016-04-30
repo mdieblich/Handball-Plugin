@@ -1,24 +1,23 @@
 <?php
 namespace handball\menu;
 
-use handball\handball;
-use handball\Trainingszeit;
+use handball\Trainingtime; // TODO kann weg?
 
 require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Location.php');
 require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Team.php');
-require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Trainingszeit.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Trainingtime.php');
 require_once (HANDBASE_PLUGIN_DIR.'/php/input/Team_Select.php');
 require_once (HANDBASE_PLUGIN_DIR.'/php/input/Location_Select.php');
 
-class ManageTrainingTimes{
+class ManageTrainingtimes{
 	
 	private static $MENU_SLUG = 'trainingszeiten';
 
 	public function __construct(){
 		add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
-		add_action( 'wp_ajax_add_trainingszeit', 'handball\menu\ManageTrainingTimes::add_trainingszeit' );
-		add_action( 'wp_ajax_change_start', 'handball\menu\ManageTrainingTimes::change_start' );
-		add_action( 'wp_ajax_change_duration', 'handball\menu\ManageTrainingTimes::change_duration' );
+		add_action( 'wp_ajax_add_trainingtime', 'handball\menu\ManageTrainingtimes::add_trainingtime' );
+		add_action( 'wp_ajax_change_start', 'handball\menu\ManageTrainingtimes::change_start' );
+		add_action( 'wp_ajax_change_duration', 'handball\menu\ManageTrainingtimes::change_duration' );
 	}
 	
 	public function add_plugin_page(){
@@ -48,7 +47,7 @@ class ManageTrainingTimes{
 		}
 		if (isset ( $_POST ['delete_id'] )) {
 			$delete_id = intval ( $_POST ['delete_id'] );
-			\handball\Trainingszeit::delete ( $delete_id );
+			\handball\Trainingtime::delete ( $delete_id );
 		}
 		if( isset ( $_POST['edit_id'] ) ){
 			$edit_id = intval($_POST['edit_id']);
@@ -61,7 +60,7 @@ class ManageTrainingTimes{
 				$location = intval($_POST['location_id']);
 			}
 			$comment = $_POST['comment'];
-			$trainigszeit = \handball\Trainingszeit::get_by_id($edit_id);
+			$trainigszeit = \handball\Trainingtime::get_by_id($edit_id);
 			$trainigszeit->set_team($team_id);
 			$trainigszeit->set_location($location);
 			$trainigszeit->set_comment($comment);
@@ -86,8 +85,8 @@ class ManageTrainingTimes{
 				events:
 					[
 					<?php 
-					$unassignedTrainingTimes = Trainingszeit::get('location is null');
-					$fullcalender_events = Trainingszeit::get_fullcalender_io_events($unassignedTrainingTimes);
+					$unassignedTrainingtimes = Trainingtime::get('location is null');
+					$fullcalender_events = Trainingtime::get_fullcalender_io_events($unassignedTrainingtimes);
 					echo implode(", \n", $fullcalender_events);
 					?>
 					]
@@ -98,7 +97,7 @@ class ManageTrainingTimes{
             	echo 'var '
 					.$location->get_fullcalendar_io_event_source_name()
 	            	.' = '
-					.$location->get_trainingszeiten_as_fullcalendar_io_event_source()
+					.$location->get_trainingtimes_as_fullcalendar_io_event_source()
 					.";\n";
             }
             ?>
@@ -166,15 +165,15 @@ class ManageTrainingTimes{
                     },
                     dayClick: function(date, jsEvent, view) {
 
-                        var newTrainingszeit = {
-                                title: 'Training',
+                        var newTrainingtime = {
+                                title: 'kein Team',
                                 start: date.format(),
                                 end: date.add(90, 'minutes').format()
                         }; 
-                        createTraningszeitOnServer(newTrainingszeit, function(createdId){
+                        createTraningszeitOnServer(newTrainingtime, function(createdId){
                             $('#calendar').fullCalendar('removeEventSource', trainingTimesWithoutLocation);
-                            newTrainingszeit.id = createdId;
-                            trainingTimesWithoutLocation.events.push(newTrainingszeit);
+                            newTrainingtime.id = createdId;
+                            trainingTimesWithoutLocation.events.push(newTrainingtime);
                             $('#calendar').fullCalendar('addEventSource', trainingTimesWithoutLocation);
 
                         });
@@ -208,15 +207,15 @@ class ManageTrainingTimes{
                 
             });
 
-            function createTraningszeitOnServer(trainingszeit, trainingszeitWasCreated){
-                var data = eventToAJAXData(trainingszeit);
-                data['action'] = 'add_trainingszeit';
+            function createTraningszeitOnServer(trainingtime, trainingtimeWasCreated){
+                var data = eventToAJAXData(trainingtime);
+                data['action'] = 'add_trainingtime';
                 
                 // since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
                 jQuery.post(ajaxurl, data, function(response) {
-                    trainingszeitCreated = JSON.parse(response);
-                    if(trainingszeitCreated != 'undefined' && trainingszeitWasCreated){
-                    	trainingszeitWasCreated(trainingszeitCreated.id);
+                    trainingtimeCreated = JSON.parse(response);
+                    if(trainingtimeCreated != 'undefined' && trainingtimeWasCreated){
+                    	trainingtimeWasCreated(trainingtimeCreated.id);
                     }else{
 						alert("Die Trainingszeit konnte nicht angelegt werden:\n"+response);
                     }
@@ -235,20 +234,20 @@ class ManageTrainingTimes{
 			}
             
 
-            function changeStart(trainingszeit, callBackFunctionOnSuccess, callBackFunctionOnFailure){
-                start = moment(trainingszeit.start);
+            function changeStart(trainingtime, callBackFunctionOnSuccess, callBackFunctionOnFailure){
+                start = moment(trainingtime.start);
                 var data = {
                 	'action': 'change_start',
-					'id': trainingszeit.id,
+					'id': trainingtime.id,
 					'time': start.format('H:mm'),
                     'weekday': start.locale('en').format('dddd')
                 }
                 jQuery.post(ajaxurl, data, function(response) {
                     try{
-	                    trainingszeitCreated = JSON.parse(response);
-	                    if(trainingszeitCreated != 'undefined'){
+	                    trainingtimeCreated = JSON.parse(response);
+	                    if(trainingtimeCreated != 'undefined'){
 	                        if(callBackFunctionOnSuccess){
-	                        	callBackFunctionOnSuccess(trainingszeitCreated);
+	                        	callBackFunctionOnSuccess(trainingtimeCreated);
 	                        }
 	                    }else{
 	                        if(callBackFunctionOnFailure){
@@ -264,20 +263,20 @@ class ManageTrainingTimes{
                     }
                 });
             }
-            function changeDuration(trainingszeit, callBackFunctionOnSuccess, callBackFunctionOnFailure){
-                start = moment(trainingszeit.start);
-                end = moment(trainingszeit.end);
+            function changeDuration(trainingtime, callBackFunctionOnSuccess, callBackFunctionOnFailure){
+                start = moment(trainingtime.start);
+                end = moment(trainingtime.end);
                 var data = {
                     'action': 'change_duration',
-    				'id': trainingszeit.id,
+    				'id': trainingtime.id,
                     'duration': end.diff(start, 'minutes')
                 };
                 jQuery.post(ajaxurl, data, function(response) {
                     try{
-	                    trainingszeitCreated = JSON.parse(response);
-	                    if(trainingszeitCreated != 'undefined'){
+	                    trainingtimeCreated = JSON.parse(response);
+	                    if(trainingtimeCreated != 'undefined'){
 	                        if(callBackFunctionOnSuccess){
-	                        	callBackFunctionOnSuccess(trainingszeitCreated);
+	                        	callBackFunctionOnSuccess(trainingtimeCreated);
 	                        }
 	                    }else{
 	                        if(callBackFunctionOnFailure){
@@ -390,11 +389,11 @@ class ManageTrainingTimes{
         <?php 
         
     }
-    public static function add_trainingszeit() {
+    public static function add_trainingtime() {
        	$weekDay = $_POST ['weekday'];
        	$time = $_POST['time'];
        	$duration =  intval ( $_POST ['duration'] );
-       	$trainigszeit = new Trainingszeit($weekDay, $time, $duration);
+       	$trainigszeit = new Trainingtime($weekDay, $time, $duration);
        	echo $trainigszeit->toJSON();
        	wp_die ();
     }
@@ -403,7 +402,7 @@ class ManageTrainingTimes{
        	$time = $_POST['time'];
        	$weekDay = $_POST ['weekday'];
        	
-       	$trainigszeit = Trainingszeit::get_by_id($id);
+       	$trainigszeit = Trainingtime::get_by_id($id);
        	if(is_null($trainigszeit)){
        		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
        		wp_die();
@@ -423,7 +422,7 @@ class ManageTrainingTimes{
        	$id = intval($_POST ['id']);
        	$duration = intval($_POST['duration']);
        	
-       	$trainigszeit = Trainingszeit::get_by_id($id);
+       	$trainigszeit = Trainingtime::get_by_id($id);
        	if(is_null($trainigszeit)){
        		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
        		wp_die();
