@@ -32,10 +32,6 @@ class Location extends WPDBObject{
 		return $this->color;
 	}
 	
-	public function get_name_for_button(){
-		return 'halle'.$this->get_id();
-	}
-	
 	protected function to_array(){
 		$array = parent::to_array();
 		$array['name'] = $this->name;
@@ -68,7 +64,7 @@ class Location extends WPDBObject{
 	}
 	
 	public function get_fullcalendar_io_event_source_name(){
-		return $this->get_abkuerzung().'Hallenzeiten';
+		return 'trainingTimes'.$this->get_abkuerzung();
 	}
 	
 	public function get_trainingszeiten_as_fullcalendar_io_event_source(){
@@ -80,7 +76,7 @@ class Location extends WPDBObject{
 	}
 	
 	private function get_trainingszeiten(){
-		return Trainingszeit::get('halle='.$this->get_id());
+		return Trainingszeit::get('location='.$this->get_id());
 	}
 }
 ?>

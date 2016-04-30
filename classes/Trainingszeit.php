@@ -6,16 +6,16 @@ class Trainingszeit extends WPDBObject{
 	
 	private $mannschaft;
 	
-	private $halle;
+	private $location;
 	private $wochentag;
 	private $uhrzeit;
 	private $dauer;
 	
 	private $hinweis;
 	
-	public function __construct($wochentag, $uhrzeit, $dauer, $halle=null, $mannschaft=null, $hinweis="", $id=null){
+	public function __construct($wochentag, $uhrzeit, $dauer, $location=null, $mannschaft=null, $hinweis="", $id=null){
 		$this->mannschaft = $mannschaft;
-		$this->halle = $halle;
+		$this->location = $location;
 		$this->wochentag = $wochentag;
 		$this->uhrzeit = $uhrzeit;
 		$this->dauer = $dauer;
@@ -26,7 +26,7 @@ class Trainingszeit extends WPDBObject{
 	protected function to_array(){
 		$array = parent::to_array();
 		$array['mannschaft'] = static::as_id($this->mannschaft);
-		$array['halle'] = static::as_id($this->halle);
+		$array['location'] = static::as_id($this->location);
 		$array['wochentag'] = $this->wochentag;
 		$array['uhrzeit'] = $this->uhrzeit;
 		$array['dauer'] = $this->dauer;
@@ -43,14 +43,14 @@ class Trainingszeit extends WPDBObject{
 		"CREATE TABLE ".static::table_name()." (
 			  id mediumint(9) NOT NULL AUTO_INCREMENT,
 			  mannschaft mediumint(9) unsigned,
-			  halle mediumint(9) unsigned,
+			  location mediumint(9) unsigned,
 			  wochentag ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'),
 			  uhrzeit char(5) NOT NULL,
 			  dauer int NOT NULL,
 			  hinweis text NULL,
 			  PRIMARY KEY (id),
  			  FOREIGN KEY (mannschaft) REFERENCES ".Mannschaft::table_name()."(id),
- 			  FOREIGN KEY (halle) REFERENCES ".Location::table_name()."(id)
+ 			  FOREIGN KEY (location) REFERENCES ".Location::table_name()."(id)
 		) ".$charset_collate.";";
 	
 		dbDelta( $sql );
@@ -60,7 +60,7 @@ class Trainingszeit extends WPDBObject{
 				$row_object->wochentag, 
 				$row_object->uhrzeit, 
 				$row_object->dauer, 
-				$row_object->halle, 
+				$row_object->location, 
 				$row_object->mannschaft, 
 				$row_object->hinweis, 
 				$row_object->id);
@@ -88,7 +88,7 @@ class Trainingszeit extends WPDBObject{
 				."title: '$teamname',\n"
 				.'start: \''.$this->get_start_in_current_week()."',\n"
 				.'end: \''.$this->get_end_in_current_week()."',\n"
-				.'halle: \''.$this->halle."',\n"
+				.'location_id: \''.$this->location."',\n"
 				.'mannschaft: \''.$this->mannschaft."',\n"
 				.'comment: \''.$this->hinweis."'\n"
 			.'}';
@@ -126,8 +126,8 @@ class Trainingszeit extends WPDBObject{
 	public function set_team($team_id){
 		$this->mannschaft = $team_id;
 	}
-	public function set_hall($hall_id){
-		$this->halle = $hall_id;
+	public function set_location($location_id){
+		$this->location = $location_id;
 	}
 	public function set_comment($comment){
 		$this->hinweis = $comment;

@@ -18,7 +18,7 @@ class ManageTrainingTimes{
 		add_submenu_page(
 				'handball', // parent_slug
 			'Handball - Trainingszeiten verwalten', // page_title
-			'Hallen & Trainingszeiten', // menu_title
+			'Trainingsorte & -zeiten', // menu_title
 			'manage_options', // capability
 			static::$MENU_SLUG,  // menu_slug
 			array( $this, 'create_manage_training_times_page' ),   // function
@@ -33,16 +33,16 @@ class ManageTrainingTimes{
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Team_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Location_Select.php');
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Weekday_Select.php');
-		if (isset ( $_POST ['createHall'] )) {
-			$neue_halle = new \handball\Halle( 
-					$_POST ['Hallenname'], 
-					$_POST ['Hallenabkuerzung'], 
+		if (isset ( $_POST ['create_location'] )) {
+			$new_location = new \handball\Location( 
+					$_POST ['location_name'], 
+					$_POST ['location_abbreviation'], 
 					$_POST ['Adresse'],
 					$_POST ['Farbe']);
 		}
-		if (isset ( $_GET ['deleteHall'] )) {
-			$delete_id = intval ( $_GET ['deleteHall'] );
-			\handball\Halle::delete ( $delete_id );
+		if (isset ( $_GET ['delete_location_id'] )) {
+			$delete_id = intval ( $_GET ['delete_location_id'] );
+			\handball\Location::delete ( $delete_id );
 		}
 		if (isset ( $_POST ['delete_id'] )) {
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
@@ -56,21 +56,21 @@ class ManageTrainingTimes{
 			if($_POST['team_id'] != ''){
 				$team_id = intval($_POST['team_id']);
 			}
-			$hall_id = null;
-			if($_POST['hall_id'] != ''){
-				$hall_id = intval($_POST['hall_id']);
+			$location = null;
+			if($_POST['location_id'] != ''){
+				$location = intval($_POST['location_id']);
 			}
 			$comment = $_POST['comment'];
 			$trainigszeit = \handball\Trainingszeit::get_by_id($edit_id);
 			$trainigszeit->set_team($team_id);
-			$trainigszeit->set_hall($hall_id);
+			$trainigszeit->set_location($location);
 			$trainigszeit->set_comment($comment);
 			$trainigszeit->save();
 		}
 		
-		echo "<h3>Hallen</h3>";
-		echo "<strong>Hinweis:</strong> Hallen können (noch) nicht geändert, nur gelöscht werden.<br><br>";
-		$alle_hallen = \handball\Location::get_all ();
+		echo "<h3>Trainingsorte</h3>";
+		echo "<strong>Hinweis:</strong> Trainingsorte können (noch) nicht geändert, nur gelöscht werden.<br><br>";
+		$all_locations = \handball\Location::get_all ();
 		$alle_mannschaften = \handball\Mannschaft::get_all ();
 		?>
 		<script type="text/javascript">
@@ -81,37 +81,37 @@ class ManageTrainingTimes{
         	var originalColorOfSelectedEvent = '';
         	var originalTextColorOfSelectedEvent = '';
 
-            var unassignedHallenzeiten = {
+            var trainingTimesWithoutLocation = {
 				color: unassignedColor,
 				events:
 					[
 					<?php 
 					require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
-					$unassignedTrainingTimes = Trainingszeit::get('halle is null');
+					$unassignedTrainingTimes = Trainingszeit::get('location is null');
 					$fullcalender_events = Trainingszeit::get_fullcalender_io_events($unassignedTrainingTimes);
 					echo implode(", \n", $fullcalender_events);
 					?>
 					]
             };
             <?php 
-            // erstellen der Event-Sources für alle zugewiesenen Hallenzeiten
+            // erstellen der Event-Sources für alle zugewiesenen Triingszeiten
 			require_once (HANDBASE_PLUGIN_DIR . '/classes/Location.php');
-            foreach($alle_hallen as $halle){
+            foreach($all_locations as $location){
             	echo 'var '
-					.$halle->get_fullcalendar_io_event_source_name()
+					.$location->get_fullcalendar_io_event_source_name()
 	            	.' = '
-					.$halle->get_trainingszeiten_as_fullcalendar_io_event_source()
+					.$location->get_trainingszeiten_as_fullcalendar_io_event_source()
 					.";\n";
             }
             ?>
 
             var allEventSources = [ 
             	<?php 
-                $hallenzeitenVariableNames = array('unassignedHallenzeiten');
-                foreach($alle_hallen as $halle){
-                	$hallenzeitenVariableNames[] = $halle->get_fullcalendar_io_event_source_name();	
+                $trainingTimesVariableNames = array('trainingTimesWithoutLocation');
+                foreach($all_locations as $location){
+                	$trainingTimesVariableNames[] = $location->get_fullcalendar_io_event_source_name();	
                 }
-                echo implode(',', $hallenzeitenVariableNames)
+                echo implode(',', $trainingTimesVariableNames)
                 ?>
 			];
             var teamVisibility = new Array();
@@ -174,10 +174,10 @@ class ManageTrainingTimes{
                                 end: date.add(90, 'minutes').format()
                         }; 
                         createTraningszeitOnServer(newTrainingszeit, function(createdId){
-                            $('#calendar').fullCalendar('removeEventSource', unassignedHallenzeiten);
+                            $('#calendar').fullCalendar('removeEventSource', trainingTimesWithoutLocation);
                             newTrainingszeit.id = createdId;
-                            unassignedHallenzeiten.events.push(newTrainingszeit);
-                            $('#calendar').fullCalendar('addEventSource', unassignedHallenzeiten);
+                            trainingTimesWithoutLocation.events.push(newTrainingszeit);
+                            $('#calendar').fullCalendar('addEventSource', trainingTimesWithoutLocation);
 
                         });
 
@@ -204,7 +204,7 @@ class ManageTrainingTimes{
                     $('#edit_id').val(event.id);
                     $('#delete_id').val(event.id);
                     $('#edit_mannschaft').val(event.mannschaft);
-                    $('#edit_halle').val(event.halle);
+                    $('#edit_location_id').val(event.location_id);
                     $('#edit_comment').val(event.comment);
                 }
                 
@@ -296,7 +296,7 @@ class ManageTrainingTimes{
                 });
             }
 
-            function toggleHall(eventSource, visible){
+            function toggleLocation(eventSource, visible){
 	            fullcalendarAction = visible ? 'addEventSource': 'removeEventSource';
                 jQuery('#calendar').fullCalendar(fullcalendarAction, eventSource);
             }
@@ -306,28 +306,28 @@ class ManageTrainingTimes{
         <form method="post">
         <table>
             <tr>
-                <th>Halle</th>
+                <th>Trainingsort</th>
                 <th>Abkürzung</th>
                 <th>Adresse</th>
                 <th>Farbe</th>
                 <td></td>
             </tr>
-            <?php foreach ( $alle_hallen as $hall ) { ?>
+            <?php foreach ( $all_locations as $location ) { ?>
             <tr>
-	            <td><?php echo $hall->get_name(); ?></td>
-	            <td><?php echo $hall->get_abkuerzung(); ?></td>
-	            <td><?php echo $hall->get_adresse(); ?></td>
-	            <td><?php echo $hall->get_color(); ?></td>
+	            <td><?php echo $location->get_name(); ?></td>
+	            <td><?php echo $location->get_abkuerzung(); ?></td>
+	            <td><?php echo $location->get_adresse(); ?></td>
+	            <td><?php echo $location->get_color(); ?></td>
 	            <td><a
-	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&deleteHall=<?php echo $hall->get_id(); ?>">Löschen</a></td>
+	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&delete_location_id=<?php echo $location->get_id(); ?>">Löschen</a></td>
             </tr>
             <?php } ?>
 	        <tr>
-	            <td><input type="text" name="Hallenname" placeholder="Name"></td>
-	            <td><input type="text" name="Hallenabkuerzung" placeholder="Abkürzung"></td>
+	            <td><input type="text" name="location_name" placeholder="Name"></td>
+	            <td><input type="text" name="location_abbreviation" placeholder="Abkürzung"></td>
 	            <td><input type="text" name="Adresse" placeholder="Adresse"></td>
 	            <td><input type="text" name="Farbe" placeholder="Farbe"></td>
-	            <td><input type="hidden" name="createHall" value="true">
+	            <td><input type="hidden" name="create_location" value="true">
 	                <?php submit_button('Anlegen', 'primary','Anlegen', false); ?></td>
 	        </tr>
         </table>
@@ -335,27 +335,27 @@ class ManageTrainingTimes{
 
 		<br clear="all" />
 		<h3>Trainingszeiten</h3>
-        <div id="hallen" style="max-width:900px; margin: 0.8em 2em;">
-        <?php foreach($alle_hallen as $halle){
-            $id = 'halle_'.$halle->get_id();
-            echo '<span style="background-color: '.$halle->get_color().'; color: white; padding: 3px; margin: 5px;"><label for="checkbox'.$id.'">'.$halle->get_abkuerzung().'&nbsp;</label>';
-            echo '<input type="checkbox" id="checkbox'.$id.'" value="'.$id.'" onchange="toggleHall('.$halle->get_fullcalendar_io_event_source_name().', this.checked)" checked></span>';
+        <div id="location" style="max-width:900px; margin: 0.8em 2em;">
+        <?php foreach($all_locations as $location){
+            $checkbox_id = 'checkbox_location_'.$location->get_id();
+            echo '<span style="background-color: '.$location->get_color().'; color: white; padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$location->get_abkuerzung().'&nbsp;</label>';
+            echo '<input type="checkbox" id="'.$checkbox_id.'" value="'.$checkbox_id.'" onchange="toggleLocation('.$location->get_fullcalendar_io_event_source_name().', this.checked)" checked></span>';
         } ?>
         	<span style="background-color: red; color:white; padding: 3px; margin: 5px;">
-        		<label for="checkboxUnassignedHall"><i>(ohne Halle)</i>&nbsp;</label>
-        		<input type="checkbox" id="checkboxUnassignedHall" value="(ohne Halle)" onchange="toggleHall(unassignedHallenzeiten, this.checked)" checked>
+        		<label for="checkbox_location_unassigned"><i>(ohne Trainigsort)</i>&nbsp;</label>
+        		<input type="checkbox" id="checkbox_location_unassigned" value="(ohne Trainingsort)" onchange="toggleLocation(trainingTimesWithoutLocation, this.checked)" checked>
         	</span>
         </div>
         <div id="mannschaften" style="max-width:900px; margin: 0.8em 2em;">
             Folgende <b>Mannschaften</b> anzeigen:<br>
 	        <?php foreach($alle_mannschaften as $mannschaft){
-	            $id = 'mannschaft_'.$mannschaft->get_id();
-	            echo '<span style="padding: 3px; margin: 5px;"><label for="'.$id.'">'.$mannschaft->get_name().'</label>';
-	            echo '<input type="checkbox" id="'.$id.'" value="'.$id.'" onchange="toggleTeam(\''.$mannschaft->get_name().'\', this.checked);" checked></span>';
+	            $checkbox_id = 'mannschaft_'.$mannschaft->get_id();
+	            echo '<span style="padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$mannschaft->get_name().'</label>';
+	            echo '<input type="checkbox" id="'.$checkbox_id.'" value="'.$checkbox_id.'" onchange="toggleTeam(\''.$mannschaft->get_name().'\', this.checked);" checked></span>';
 	        } ?>
 	        <span style="padding: 3px; margin: 5px;">
         		<label for="checkboxNoTeam"><i>(Kein Team)</i>&nbsp;</label>
-        		<input type="checkbox" id="checkboxNoTeam" value="(ohne Halle)" onchange="toggleTeam('Kein Team', this.checked)" checked>
+        		<input type="checkbox" id="checkboxNoTeam" value="(ohne Trainingsort)" onchange="toggleTeam('Kein Team', this.checked)" checked>
         	</span>
         </div>
         <div id="currenttermin" style="margin: 1em 2em 0em; padding: 0.5em; background: white;  display:inline-block; ">
@@ -363,7 +363,7 @@ class ManageTrainingTimes{
             <form method="post">
             <?php
             	echo \handball\input\team_select('team_id', 'edit_mannschaft'); 
-            	echo \handball\input\location_Select('hall_id', 'edit_halle');
+            	echo \handball\input\location_Select('location_id', 'edit_location_id');
             ?>
             <br>
             <b>Trainingshinweis:</b><br>
