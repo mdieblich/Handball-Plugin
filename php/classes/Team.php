@@ -1,8 +1,10 @@
 <?php
 
 namespace handball;
-require_once 'WPDBObject.php';
-require_once 'Handballer.php';
+
+require_once(ABSPATH.'wp-admin/includes/upgrade.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/WPDBObject.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Handballer.php');
 
 /**
  * TODO Datenbank-Schema-Upgrade: https://codex.wordpress.org/Creating_Tables_with_Plugins
@@ -140,8 +142,6 @@ class Team extends WPDBObject{
 	
 	public static function install(){
 		global $wpdb;
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Handballer.php');
 	
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql =

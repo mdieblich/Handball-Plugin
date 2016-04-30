@@ -3,6 +3,13 @@ namespace handball\menu;
 
 use handball\handball;
 use handball\Trainingszeit;
+
+require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Location.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Team.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Trainingszeit.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/input/Team_Select.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/input/Location_Select.php');
+
 class ManageTrainingTimes{
 	
 	private static $MENU_SLUG = 'trainingszeiten';
@@ -28,10 +35,6 @@ class ManageTrainingTimes{
 	}
 	
 	public function create_manage_training_times_page(){
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Location.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Team.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Team_Select.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Location_Select.php');
 		if (isset ( $_POST ['create_location'] )) {
 			$new_location = new \handball\Location( 
 					$_POST ['location_name'], 
@@ -44,12 +47,10 @@ class ManageTrainingTimes{
 			\handball\Location::delete ( $delete_id );
 		}
 		if (isset ( $_POST ['delete_id'] )) {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
 			$delete_id = intval ( $_POST ['delete_id'] );
 			\handball\Trainingszeit::delete ( $delete_id );
 		}
 		if( isset ( $_POST['edit_id'] ) ){
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
 			$edit_id = intval($_POST['edit_id']);
 			$team_id = null;
 			if($_POST['team_id'] != ''){
@@ -85,7 +86,6 @@ class ManageTrainingTimes{
 				events:
 					[
 					<?php 
-					require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
 					$unassignedTrainingTimes = Trainingszeit::get('location is null');
 					$fullcalender_events = Trainingszeit::get_fullcalender_io_events($unassignedTrainingTimes);
 					echo implode(", \n", $fullcalender_events);
@@ -94,7 +94,6 @@ class ManageTrainingTimes{
             };
             <?php 
             // erstellen der Event-Sources für alle zugewiesenen Triingszeiten
-			require_once (HANDBASE_PLUGIN_DIR . '/classes/Location.php');
             foreach($all_locations as $location){
             	echo 'var '
 					.$location->get_fullcalendar_io_event_source_name()
@@ -392,7 +391,6 @@ class ManageTrainingTimes{
         
     }
     public static function add_trainingszeit() {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
        	$weekDay = $_POST ['weekday'];
        	$time = $_POST['time'];
        	$duration =  intval ( $_POST ['duration'] );
@@ -401,7 +399,6 @@ class ManageTrainingTimes{
        	wp_die ();
     }
     public static function change_start() {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
        	$id = intval($_POST ['id']);
        	$time = $_POST['time'];
        	$weekDay = $_POST ['weekday'];
@@ -423,7 +420,6 @@ class ManageTrainingTimes{
        	wp_die ();
     }
     public static function change_duration() {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
        	$id = intval($_POST ['id']);
        	$duration = intval($_POST['duration']);
        	

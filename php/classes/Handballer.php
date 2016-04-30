@@ -1,7 +1,8 @@
 <?php
 
 namespace handball;
-require_once("Spielposition.php");
+
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Spielposition.php');
 
 class Handballer{
 	

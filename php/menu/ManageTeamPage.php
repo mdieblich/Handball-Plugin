@@ -1,8 +1,12 @@
 <?php
 
 namespace handball\menu;
+
 use handball\Team;
-require_once (ABSPATH . 'wp-content/plugins/handball-basisplugin/classes/Team.php');
+
+require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Team.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/input/Team_Select.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/input/User_Select.php');
 
 class ManageTeamPage {
 	private static $MENU_SLUG = 'handball_manage_team';
@@ -26,9 +30,6 @@ class ManageTeamPage {
 
 	}
 	public function manage_team_page() {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Team_Select.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/User_Select.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Team.php');
 		echo \handball\input\team_select('team_id', 'team_id', "window.location.href='admin.php?page=".static::$MENU_SLUG."&team_id='+this.value");
 		if(isset($_GET['team_id'])){
 			$team = \handball\Team::get_by_id(intval($_GET['team_id']));

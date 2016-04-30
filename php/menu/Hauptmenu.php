@@ -2,7 +2,9 @@
 namespace handball\menu;
 
 use handball\Handballer;
-use handball\handball;
+
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Handballer.php');
+
 class Hauptmenu{
 
 	public function __construct(){

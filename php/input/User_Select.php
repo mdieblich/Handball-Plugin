@@ -3,13 +3,14 @@ namespace handball\input;
 
 use handball\Handballer;
 
+require_once(ABSPATH.'wp-includes/user.php');
+
 function select_user($name, $onchange=null, $select=-1){
 	$onchange = (is_null($onchange)) ? '': 'onchange="'.$onchange.'"';  
 	?>
 	<select name="<?php echo $name; ?>" <?php echo $onchange;?>>
 		<option value="-1" style="color:silver; font-style:italic">niemand</option>
 	<?php 
-		require_once( ABSPATH . 'wp-includes/user.php' );
 		// TODO $all_users cachen oder als Singleton
 		// TODO dies �ber Handballer::get_all() machen.
 		$all_users = get_users(array(

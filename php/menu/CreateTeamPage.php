@@ -2,7 +2,9 @@
 
 namespace handball\menu;
 
-require_once (ABSPATH . 'wp-content/plugins/handball-basisplugin/classes/Team.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Team.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/input/User_Select.php');
+
 class CreateTeamPage {
 	private static $MENU_SLUG = 'handball_create_team';
 	public function __construct() {
@@ -26,8 +28,6 @@ class CreateTeamPage {
 
 	}
 	public function create_team_page() {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Team.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/User_Select.php');
 		
 		if (isset ( $_POST ['createTeam'] )) {
 			new \handball\Team ( $_POST ['Teamname'], intval($_POST ['Trainer']), intval($_POST ['Cotrainer']) );

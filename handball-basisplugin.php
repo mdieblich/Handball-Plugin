@@ -29,10 +29,9 @@ add_action( 'show_user_profile', 'handball\show_extra_profile_fields' );
 add_action( 'edit_user_profile', 'handball\show_extra_profile_fields' );
 
 function activate(){
-	require_once 'classes/Handballer.php';
-	require_once 'classes/Team.php';
-	require_once 'classes/Location.php';
-	require_once 'classes/Trainingszeit.php';
+	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Team.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Location.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Trainingszeit.php');
 	
 	Team::install();
 	Location::install();
@@ -45,16 +44,16 @@ function deactivate(){
 }
 
 function show_extra_profile_fields( $user ) {
-	require_once 'classes/Handballer.php';
+	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Handballer.php');
 	$handballer = new Handballer($user->ID);
 	$handballer->show_profile_extras();
 }
 
 function save_extra_profile_fields( $user_id ) {
+	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Handballer.php');
 	if ( !current_user_can( 'edit_user', $user_id ) )
 		return false;
-
-	require_once 'classes/Handballer.php';
+	
 	$handballer = new Handballer($user_id);
 	$handballer->save_from_post();
 
@@ -62,25 +61,14 @@ function save_extra_profile_fields( $user_id ) {
 
 
 if( is_admin() ){
-	require_once 'classes/menu/Hauptmenu.php';
-	require_once 'classes/menu/CreateTeamPage.php';
-	require_once 'classes/menu/ManageTeamPage.php';
-	require_once 'classes/menu/ManageTrainingTimes.php';
+	require_once (HANDBASE_PLUGIN_DIR . '/php/menu/Hauptmenu.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/menu/CreateTeamPage.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/menu/ManageTeamPage.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/menu/ManageTrainingTimes.php');
 	new menu\Hauptmenu();
 	new menu\ManageTrainingTimes();
 	new menu\CreateTeamPage();
 	new menu\ManageTeamPage();
 	// TODO "mein Team"-Seite
 }
-// function my_action_callback() {
-// 	global $wpdb; // this is how you get access to the database
-
-// 	$whatever = intval( $_POST['whatever'] );
-
-// 	$whatever += 10;
-
-// 	echo $whatever;
-
-// 	wp_die(); // this is required to terminate immediately and return a proper response
-// }
 ?>

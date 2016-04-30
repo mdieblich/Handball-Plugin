@@ -1,7 +1,9 @@
 <?php
 
 namespace handball;
-require_once 'WPDBObject.php';
+
+require_once(ABSPATH.'wp-admin/includes/upgrade.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/WPDBObject.php');
 
 class Location extends WPDBObject{
 	private $name;
@@ -43,7 +45,6 @@ class Location extends WPDBObject{
 	
 	public static function install(){
 		global $wpdb;
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql =
