@@ -38,7 +38,7 @@ class ManageTrainingtimes{
 			$new_location = new \handball\Location( 
 					$_POST ['location_name'], 
 					$_POST ['location_abbreviation'], 
-					$_POST ['Adresse'],
+					$_POST ['location_address'],
 					$_POST ['Farbe']);
 		}
 		if (isset ( $_GET ['delete_location_id'] )) {
@@ -312,8 +312,8 @@ class ManageTrainingtimes{
             <?php foreach ( $all_locations as $location ) { ?>
             <tr>
 	            <td><?php echo $location->get_name(); ?></td>
-	            <td><?php echo $location->get_abkuerzung(); ?></td>
-	            <td><?php echo $location->get_adresse(); ?></td>
+	            <td><?php echo $location->get_abbreviation(); ?></td>
+	            <td><?php echo $location->get_address(); ?></td>
 	            <td><?php echo $location->get_color(); ?></td>
 	            <td><a
 	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&delete_location_id=<?php echo $location->get_id(); ?>">Löschen</a></td>
@@ -322,7 +322,7 @@ class ManageTrainingtimes{
 	        <tr>
 	            <td><input type="text" name="location_name" placeholder="Name"></td>
 	            <td><input type="text" name="location_abbreviation" placeholder="Abkürzung"></td>
-	            <td><input type="text" name="Adresse" placeholder="Adresse"></td>
+	            <td><input type="text" name="location_address" placeholder="Adresse"></td>
 	            <td><input type="text" name="Farbe" placeholder="Farbe"></td>
 	            <td><input type="hidden" name="create_location" value="true">
 	                <?php submit_button('Anlegen', 'primary','Anlegen', false); ?></td>
@@ -335,7 +335,7 @@ class ManageTrainingtimes{
         <div id="location" style="max-width:900px; margin: 0.8em 2em;">
         <?php foreach($all_locations as $location){
             $checkbox_id = 'checkbox_location_'.$location->get_id();
-            echo '<span style="background-color: '.$location->get_color().'; color: white; padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$location->get_abkuerzung().'&nbsp;</label>';
+            echo '<span style="background-color: '.$location->get_color().'; color: white; padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$location->get_abbreviation().'&nbsp;</label>';
             echo '<input type="checkbox" id="'.$checkbox_id.'" value="'.$checkbox_id.'" onchange="toggleLocation('.$location->get_fullcalendar_io_event_source_name().', this.checked)" checked></span>';
         } ?>
         	<span style="background-color: red; color:white; padding: 3px; margin: 5px;">

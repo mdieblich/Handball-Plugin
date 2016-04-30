@@ -7,15 +7,15 @@ require_once(HANDBASE_PLUGIN_DIR.'/php/classes/WPDBObject.php');
 
 class Location extends WPDBObject{
 	private $name;
-	private $abkuerzung;
-	private $adresse;
+	private $abbreviation;
+	private $address;
 	private $color;
 	
-	public function __construct($name, $abkuerzung, $adresse, $color, $id=null){
-		// TODO SQLInjection abfangen 
+	public function __construct($name, $abbreviation, $address, $color, $id=null){
+		// TODO prevent MySQLInjection 
 		$this->name = $name;
-		$this->abkuerzung = $abkuerzung;
-		$this->adresse = $adresse;
+		$this->abbreviation = $abbreviation;
+		$this->address = $address;
 		$this->color = $color;
 		parent::__construct($id);
 	}
@@ -24,11 +24,11 @@ class Location extends WPDBObject{
 		return $this->name;
 	}
 	
-	public function get_abkuerzung(){
-		return $this->abkuerzung;
+	public function get_abbreviation(){
+		return $this->abbreviation;
 	}
-	public function get_adresse(){
-		return $this->adresse;
+	public function get_address(){
+		return $this->address;
 	}
 	public function get_color(){
 		return $this->color;
@@ -37,8 +37,8 @@ class Location extends WPDBObject{
 	protected function to_array(){
 		$array = parent::to_array();
 		$array['name'] = $this->name;
-		$array['abkuerzung'] = $this->abkuerzung;
-		$array['adresse'] = $this->adresse;
+		$array['abbreviation'] = $this->abbreviation;
+		$array['address'] = $this->address;
 		$array['color'] = $this->color;
 		return $array;
 	}
@@ -51,8 +51,8 @@ class Location extends WPDBObject{
 		"CREATE TABLE ".static::table_name()." (
 			  id mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
 			  name tinytext NOT NULL,
-			  abkuerzung tinytext NOT NULL,
-			  adresse text NOT NULL,
+			  abbreviation tinytext NOT NULL,
+			  address text NOT NULL,
 			  color tinytext NOT NULL,
 			  PRIMARY KEY (id)
 		) ".$charset_collate.";";
@@ -61,11 +61,11 @@ class Location extends WPDBObject{
 	}
 	
 	protected static function row_to_object($row_object){
-		return new Location($row_object->name, $row_object->abkuerzung, $row_object->adresse, $row_object->color, $row_object->id);
+		return new Location($row_object->name, $row_object->abbreviation, $row_object->address, $row_object->color, $row_object->id);
 	}
 	
 	public function get_fullcalendar_io_event_source_name(){
-		return 'trainingTimes'.$this->get_abkuerzung();
+		return 'trainingtimes'.$this->get_abbreviation();
 	}
 	
 	public function get_trainingtimes_as_fullcalendar_io_event_source(){
