@@ -44,6 +44,11 @@ class ManageTrainingTimes{
 			$delete_id = intval ( $_GET ['deleteHall'] );
 			\handball\Halle::delete ( $delete_id );
 		}
+		if (isset ( $_POST ['delete_id'] )) {
+		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
+			$delete_id = intval ( $_POST ['delete_id'] );
+			\handball\Trainingszeit::delete ( $delete_id );
+		}
 		if( isset ( $_POST['edit_id'] ) ){
 		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
 			$edit_id = intval($_POST['edit_id']);
@@ -178,7 +183,7 @@ class ManageTrainingTimes{
 
                     },
                     eventRender: function(event, element){
-						return teamVisibility[event.mannschaft];
+						return teamVisibility[event.title];
                     }
                  });
 
@@ -367,7 +372,7 @@ class ManageTrainingTimes{
              <?php submit_button('Speichern', 'primary','Speichern', false); ?>
             </form>
             <form method="post">
-                <input type="hidden" name="id" id="delete_id" value="-1">
+                <input type="hidden" name="delete_id" id="delete_id" value="-1">
              <?php submit_button('Löschen', 'primary','Löschen', false); ?>
             </form>
         </div>

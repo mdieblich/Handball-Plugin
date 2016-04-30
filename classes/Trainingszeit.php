@@ -89,7 +89,7 @@ class Trainingszeit extends WPDBObject{
 				.'start: \''.$this->get_start_in_current_week()."',\n"
 				.'end: \''.$this->get_end_in_current_week()."',\n"
 				.'halle: \''.$this->halle."',\n"
-				.'mannschaft: \''.$teamname."',\n"
+				.'mannschaft: \''.$this->mannschaft."',\n"
 				.'comment: \''.$this->hinweis."'\n"
 			.'}';
 	}
