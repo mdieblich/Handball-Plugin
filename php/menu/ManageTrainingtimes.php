@@ -59,11 +59,11 @@ class ManageTrainingtimes{
 			if($_POST['location_id'] != ''){
 				$location = intval($_POST['location_id']);
 			}
-			$comment = $_POST['comment'];
+			$note = $_POST['note'];
 			$trainigszeit = \handball\Trainingtime::get_by_id($edit_id);
 			$trainigszeit->set_team($team_id);
 			$trainigszeit->set_location($location);
-			$trainigszeit->set_comment($comment);
+			$trainigszeit->set_note($note);
 			$trainigszeit->save();
 		}
 		
@@ -202,7 +202,7 @@ class ManageTrainingtimes{
                     $('#delete_id').val(event.id);
                     $('#edit_team_id').val(event.team_id);
                     $('#edit_location_id').val(event.location_id);
-                    $('#edit_comment').val(event.comment);
+                    $('#edit_note').val(event.note);
                 }
                 
             });
@@ -364,7 +364,7 @@ class ManageTrainingtimes{
             ?>
             <br>
             <b>Trainingshinweis:</b><br>
-            <textarea name="comment" id="edit_comment"></textarea><br>
+            <textarea name="note" id="edit_note"></textarea><br>
             <input type="hidden" name="edit_id" id="edit_id" value="-1" size="3">
              <?php submit_button('Speichern', 'primary','Speichern', false); ?>
             </form>
@@ -407,8 +407,8 @@ class ManageTrainingtimes{
        		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
        		wp_die();
        	}
-       	$trainigszeit->set_uhrzeit($time);
-       	$trainigszeit->set_wochentag($weekDay);
+       	$trainigszeit->set_time($time);
+       	$trainigszeit->set_weekday($weekDay);
        	if($trainigszeit->save()){
        		echo $trainigszeit->toJSON();
        	}else{
@@ -427,7 +427,7 @@ class ManageTrainingtimes{
        		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
        		wp_die();
        	}
-       	$trainigszeit->set_dauer($duration);
+       	$trainigszeit->set_duration_minutes($duration);
        	if($trainigszeit->save()){
        		echo $trainigszeit->toJSON();
        	}else{

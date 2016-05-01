@@ -40,13 +40,13 @@ function select_multiple_users($team){
 				'orderby'      => 'nicename',
 				'order'        => 'ASC'
 		));
-		$stammspieler = array();
-		$zusatzspieler = array();
+		$main_players = array();
+		$additional_players = array();
 		foreach ($all_users as $user){
-			if($team->is_stammspieler($user)){
-				$stammspieler[] = $user;
-			}else if($team->is_zusatzspieler($user)){
-				$zusatzspieler[] = $user;
+			if($team->is_main_player($user)){
+				$main_players[] = $user;
+			}else if($team->is_additional_player($user)){
+				$additional_players[] = $user;
 			}else{
 				echo '<option value="'.$user->ID.'">'.$user->first_name.' '.$user->last_name.'</option>';
 			}
@@ -71,7 +71,7 @@ function select_multiple_users($team){
 		Stammspieler<br>
 		<select name="to[]" id="multi_d_to" class="form-control" size="8" multiple="multiple">
 		<?php
-		foreach ($stammspieler as $user){
+		foreach ($main_players as $user){
 			echo '<option value="'.$user->ID.'">'.$user->first_name.' '.$user->last_name.'</option>';
 		}	
 		?>
@@ -82,7 +82,7 @@ function select_multiple_users($team){
 		Zusatzspieler<br>
 		<select name="to_2[]" id="multi_d_to_2" class="form-control" size="8" multiple="multiple">
 		<?php
-		foreach ($zusatzspieler as $user){
+		foreach ($additional_players as $user){
 			echo '<option value="'.$user->ID.'">'.$user->first_name.' '.$user->last_name.'</option>';
 		}	
 		?>

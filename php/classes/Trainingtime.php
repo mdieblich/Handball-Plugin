@@ -1,6 +1,7 @@
 <?php
 namespace handball;
 
+require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 require_once(HANDBASE_PLUGIN_DIR.'/php/classes/WPDBObject.php');
 
 class Trainingtime extends WPDBObject{
@@ -8,19 +9,19 @@ class Trainingtime extends WPDBObject{
 	private $team;
 	
 	private $location;
-	private $wochentag;
-	private $uhrzeit;
-	private $dauer;
+	private $weekday;
+	private $time;
+	private $duration_minutes;
 	
-	private $hinweis;
+	private $note;
 	
-	public function __construct($wochentag, $uhrzeit, $dauer, $location=null, $team=null, $hinweis="", $id=null){
+	public function __construct($weekday, $time, $duration_minutes, $location=null, $team=null, $note="", $id=null){
 		$this->team = $team;
 		$this->location = $location;
-		$this->wochentag = $wochentag;
-		$this->uhrzeit = $uhrzeit;
-		$this->dauer = $dauer;
-		$this->hinweis = $hinweis;
+		$this->weekday = $weekday;
+		$this->time = $time;
+		$this->duration_minutes = $duration_minutes;
+		$this->note = $note;
 		parent::__construct($id);
 	}
 	
@@ -28,27 +29,25 @@ class Trainingtime extends WPDBObject{
 		$array = parent::to_array();
 		$array['team'] = static::as_id($this->team);
 		$array['location'] = static::as_id($this->location);
-		$array['wochentag'] = $this->wochentag;
-		$array['uhrzeit'] = $this->uhrzeit;
-		$array['dauer'] = $this->dauer;
-		$array['hinweis'] = $this->hinweis;
+		$array['weekday'] = $this->weekday;
+		$array['time'] = $this->time;
+		$array['duration_minutes'] = $this->duration_minutes;
+		$array['note'] = $this->note;
 		return $array;
 	}
 
 	public static function install(){
 		global $wpdb;
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-	
 		$charset_collate = $wpdb->get_charset_collate();
 		$sql =
 		"CREATE TABLE ".static::table_name()." (
 			  id mediumint(9) NOT NULL AUTO_INCREMENT,
 			  team mediumint(9) unsigned,
 			  location mediumint(9) unsigned,
-			  wochentag ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'),
-			  uhrzeit char(5) NOT NULL,
-			  dauer int NOT NULL,
-			  hinweis text NULL,
+			  weekday ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'),
+			  time char(5) NOT NULL,
+			  duration_minutes int NOT NULL,
+			  note text NULL,
 			  PRIMARY KEY (id),
  			  FOREIGN KEY (team) REFERENCES ".Team::table_name()."(id),
  			  FOREIGN KEY (location) REFERENCES ".Location::table_name()."(id)
@@ -58,12 +57,12 @@ class Trainingtime extends WPDBObject{
 	}
 	protected static function row_to_object($row_object){
 		return new Trainingtime(
-				$row_object->wochentag, 
-				$row_object->uhrzeit, 
-				$row_object->dauer, 
+				$row_object->weekday, 
+				$row_object->time, 
+				$row_object->duration_minutes, 
 				$row_object->location, 
 				$row_object->team, 
-				$row_object->hinweis, 
+				$row_object->note, 
 				$row_object->id);
 	}
 	
@@ -91,38 +90,38 @@ class Trainingtime extends WPDBObject{
 				.'end: \''.$this->get_end_in_current_week()."',\n"
 				.'location_id: \''.$this->location."',\n"
 				.'team_id: \''.$this->team."',\n"
-				.'comment: \''.$this->hinweis."'\n"
+				.'note: \''.$this->note."'\n"
 			.'}';
 	}
 		
 	private function get_start_in_current_week(){
-		return date('Y-m-d', $this->get_day_in_current_week()).'T'.date('H:i', strtotime($this->uhrzeit)).':00';
+		return date('Y-m-d', $this->get_day_in_current_week()).'T'.date('H:i', strtotime($this->time)).':00';
 	}
 	
 	private function get_day_in_current_week(){
-		$weekday = date('w', strtotime($this->wochentag));
+		$weekday = date('w', strtotime($this->weekday));
 		if($weekday == 0){ $weekday=7;}
 		$currentWeekDay = date('w');
 		if($currentWeekDay == 0){ $currentWeekDay=7;}
 		return strtotime(($weekday-$currentWeekDay).' day');
 	}
 	private function get_end_in_current_week(){
-		return date('Y-m-d', $this->get_day_in_current_week()).'T'.$this->get_endzeit().':00';
+		return date('Y-m-d', $this->get_day_in_current_week()).'T'.$this->get_endtime().':00';
 	}
-	private function get_endzeit(){
-		$startzeit = strtotime($this->uhrzeit);
-		$endzeit = strtotime($this->dauer.' min', $startzeit);
-		return date('H:i', $endzeit);
+	private function get_endtime(){
+		$starttime = strtotime($this->time);
+		$endtime = strtotime($this->duration_minutes.' min', $starttime);
+		return date('H:i', $endtime);
 	}
 
-	public function set_uhrzeit($uhrzeit){
-		$this->uhrzeit = $uhrzeit;
+	public function set_time($time){
+		$this->time = $time;
 	}
-	public function set_wochentag($wochentag){
-		$this->wochentag = $wochentag;
+	public function set_weekday($weekday){
+		$this->weekday = $weekday;
 	}
-	public function set_dauer($dauer){
-		$this->dauer = $dauer;
+	public function set_duration_minutes($duration_minutes){
+		$this->duration_minutes = $duration_minutes;
 	}
 	public function set_team($team_id){
 		$this->team = $team_id;
@@ -130,8 +129,8 @@ class Trainingtime extends WPDBObject{
 	public function set_location($location_id){
 		$this->location = $location_id;
 	}
-	public function set_comment($comment){
-		$this->hinweis = $comment;
+	public function set_note($note){
+		$this->note = $note;
 	}
 }
 ?>

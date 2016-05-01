@@ -167,7 +167,7 @@ class Player{
 		$teams = array();
 
 		global $wpdb;
-		$sql = "SELECT team FROM ". Team::table_stammspieler()." WHERE user=$this->id";
+		$sql = "SELECT team FROM ". Team::table_main_players()." WHERE user=$this->id";
 		foreach($wpdb->get_results($sql) as $row){
 			$teams[] = Team::get_by_id($row->team);
 		}
@@ -178,7 +178,7 @@ class Player{
 		$teams = array();
 
 		global $wpdb;
-		$sql = "SELECT team FROM ". Team::table_zusatzspieler()." WHERE user=$this->id";
+		$sql = "SELECT team FROM ". Team::table_additional_players()." WHERE user=$this->id";
 		foreach($wpdb->get_results($sql) as $row){
 			$teams[] = Team::get_by_id($row->team);
 		}
@@ -188,7 +188,7 @@ class Player{
 	public function list_main_teams(){
 		?><tr>
 			<th>
-				<label for="additional_teams">Stammmannschaften</label>
+				<label for="main_teams">Stammmannschaften</label>
 			</th>
 			<td>
 				<?php 

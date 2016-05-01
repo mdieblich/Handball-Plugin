@@ -12,10 +12,10 @@ class ManageTeamPage {
 	private static $MENU_SLUG = 'handball_manage_team';
 	public function __construct() {
 		add_action ( 'admin_menu', array ($this, 'add_plugin_page') );
-		add_action ( 'wp_ajax_add_stammspieler', 'handball\menu\ManageTeamPage::add_stammspieler' );
-		add_action ( 'wp_ajax_remove_stammspieler', 'handball\menu\ManageTeamPage::remove_stammspieler' );
-		add_action ( 'wp_ajax_add_zusatzspieler', 'handball\menu\ManageTeamPage::add_zusatzspieler' );
-		add_action ( 'wp_ajax_remove_zusatzspieler', 'handball\menu\ManageTeamPage::remove_zusatzspieler' );
+		add_action ( 'wp_ajax_add_main_player', 'handball\menu\ManageTeamPage::add_main_player' );
+		add_action ( 'wp_ajax_remove_main_player', 'handball\menu\ManageTeamPage::remove_main_player' );
+		add_action ( 'wp_ajax_add_additional_player', 'handball\menu\ManageTeamPage::add_additional_player' );
+		add_action ( 'wp_ajax_remove_additional_player', 'handball\menu\ManageTeamPage::remove_additional_player' );
 	}
 	public function add_plugin_page() {
 		add_submenu_page ( 'handball', // parent_slug
@@ -39,25 +39,25 @@ class ManageTeamPage {
 			
 		}
 	}
-	public static function add_stammspieler() {
+	public static function add_main_player() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
 		echo \handball\Team::add_main_player_to_team( $team_id, $user_id );
 		wp_die ();
 	}
-	public static function remove_stammspieler() {
+	public static function remove_main_player() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
-		echo \handball\Team::remove_additional_player_from_team( $team_id, $user_id );
+		echo \handball\Team::remove_main_player_from_team( $team_id, $user_id );
 		wp_die ();
 	}
-	public static function add_zusatzspieler() {
+	public static function add_additional_player() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
 		echo \handball\Team::add_additional_player_to_team( $team_id, $user_id );
 		wp_die ();
 	}
-	public static function remove_zusatzspieler() {
+	public static function remove_additional_player() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
 		echo \handball\Team::remove_additional_player_from_team( $team_id, $user_id );
