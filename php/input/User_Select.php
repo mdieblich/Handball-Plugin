@@ -1,7 +1,9 @@
 <?php
 namespace handball\input;
 
-use handball\Handballer;
+use handball\Player;
+
+require_once(ABSPATH.'wp-includes/user.php');
 
 function select_user($name, $onchange=null, $select=-1){
 	$onchange = (is_null($onchange)) ? '': 'onchange="'.$onchange.'"';  
@@ -9,9 +11,8 @@ function select_user($name, $onchange=null, $select=-1){
 	<select name="<?php echo $name; ?>" <?php echo $onchange;?>>
 		<option value="-1" style="color:silver; font-style:italic">niemand</option>
 	<?php 
-		require_once( ABSPATH . 'wp-includes/user.php' );
 		// TODO $all_users cachen oder als Singleton
-		// TODO dies �ber Handballer::get_all() machen.
+		// TODO dies mit Player::get_all() machen.
 		$all_users = get_users(array(
 				'orderby'      => 'nicename',
 				'order'        => 'ASC'
@@ -29,7 +30,7 @@ function select_multiple_users($team){
 	wp_enqueue_script('multiselect-team', plugins_url('/handball-basisplugin/javascript/multiselect-team.js'), array('multiselect'));
 	?>
 	<script type="text/javascript">
-	var teamid=<?php echo $team->get_id(); ?>;
+	var team_id=<?php echo $team->get_id(); ?>;
 	</script>
 	<div style="float:left;">
 		Alle Spieler<br>
@@ -39,13 +40,13 @@ function select_multiple_users($team){
 				'orderby'      => 'nicename',
 				'order'        => 'ASC'
 		));
-		$stammspieler = array();
-		$zusatzspieler = array();
+		$main_players = array();
+		$additional_players = array();
 		foreach ($all_users as $user){
-			if($team->is_stammspieler($user)){
-				$stammspieler[] = $user;
-			}else if($team->is_zusatzspieler($user)){
-				$zusatzspieler[] = $user;
+			if($team->is_main_player($user)){
+				$main_players[] = $user;
+			}else if($team->is_additional_player($user)){
+				$additional_players[] = $user;
 			}else{
 				echo '<option value="'.$user->ID.'">'.$user->first_name.' '.$user->last_name.'</option>';
 			}
@@ -70,7 +71,7 @@ function select_multiple_users($team){
 		Stammspieler<br>
 		<select name="to[]" id="multi_d_to" class="form-control" size="8" multiple="multiple">
 		<?php
-		foreach ($stammspieler as $user){
+		foreach ($main_players as $user){
 			echo '<option value="'.$user->ID.'">'.$user->first_name.' '.$user->last_name.'</option>';
 		}	
 		?>
@@ -81,7 +82,7 @@ function select_multiple_users($team){
 		Zusatzspieler<br>
 		<select name="to_2[]" id="multi_d_to_2" class="form-control" size="8" multiple="multiple">
 		<?php
-		foreach ($zusatzspieler as $user){
+		foreach ($additional_players as $user){
 			echo '<option value="'.$user->ID.'">'.$user->first_name.' '.$user->last_name.'</option>';
 		}	
 		?>

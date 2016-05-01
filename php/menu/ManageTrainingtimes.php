@@ -1,24 +1,30 @@
 <?php
 namespace handball\menu;
 
-use handball\handball;
-use handball\Trainingszeit;
-class ManageTrainingTimes{
+use handball\Trainingtime; // TODO kann weg?
+
+require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Location.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Team.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Trainingtime.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/input/Team_Select.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/input/Location_Select.php');
+
+class ManageTrainingtimes{
 	
 	private static $MENU_SLUG = 'trainingszeiten';
 
 	public function __construct(){
 		add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
-		add_action( 'wp_ajax_add_trainingszeit', 'handball\menu\ManageTrainingTimes::add_trainingszeit' );
-		add_action( 'wp_ajax_change_start', 'handball\menu\ManageTrainingTimes::change_start' );
-		add_action( 'wp_ajax_change_duration', 'handball\menu\ManageTrainingTimes::change_duration' );
+		add_action( 'wp_ajax_add_trainingtime', 'handball\menu\ManageTrainingtimes::add_trainingtime' );
+		add_action( 'wp_ajax_change_start', 'handball\menu\ManageTrainingtimes::change_start' );
+		add_action( 'wp_ajax_change_duration', 'handball\menu\ManageTrainingtimes::change_duration' );
 	}
 	
 	public function add_plugin_page(){
 		add_submenu_page(
 				'handball', // parent_slug
 			'Handball - Trainingszeiten verwalten', // page_title
-			'Hallen & Trainingszeiten', // menu_title
+			'Trainingsorte & -zeiten', // menu_title
 			'manage_options', // capability
 			static::$MENU_SLUG,  // menu_slug
 			array( $this, 'create_manage_training_times_page' ),   // function
@@ -28,50 +34,43 @@ class ManageTrainingTimes{
 	}
 	
 	public function create_manage_training_times_page(){
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Halle.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Mannschaft.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Team_Select.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Hall_Select.php');
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/input/Weekday_Select.php');
-		if (isset ( $_POST ['createHall'] )) {
-			$neue_halle = new \handball\Halle( 
-					$_POST ['Hallenname'], 
-					$_POST ['Hallenabkuerzung'], 
-					$_POST ['Adresse'],
+		if (isset ( $_POST ['create_location'] )) {
+			new \handball\Location( 
+					$_POST ['location_name'], 
+					$_POST ['location_abbreviation'], 
+					$_POST ['location_address'],
 					$_POST ['Farbe']);
 		}
-		if (isset ( $_GET ['deleteHall'] )) {
-			$delete_id = intval ( $_GET ['deleteHall'] );
-			\handball\Halle::delete ( $delete_id );
+		if (isset ( $_GET ['delete_location_id'] )) {
+			$delete_id = intval ( $_GET ['delete_location_id'] );
+			\handball\Location::delete ( $delete_id );
 		}
 		if (isset ( $_POST ['delete_id'] )) {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
 			$delete_id = intval ( $_POST ['delete_id'] );
-			\handball\Trainingszeit::delete ( $delete_id );
+			\handball\Trainingtime::delete ( $delete_id );
 		}
 		if( isset ( $_POST['edit_id'] ) ){
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
 			$edit_id = intval($_POST['edit_id']);
 			$team_id = null;
 			if($_POST['team_id'] != ''){
 				$team_id = intval($_POST['team_id']);
 			}
-			$hall_id = null;
-			if($_POST['hall_id'] != ''){
-				$hall_id = intval($_POST['hall_id']);
+			$location = null;
+			if($_POST['location_id'] != ''){
+				$location = intval($_POST['location_id']);
 			}
-			$comment = $_POST['comment'];
-			$trainigszeit = \handball\Trainingszeit::get_by_id($edit_id);
-			$trainigszeit->set_team($team_id);
-			$trainigszeit->set_hall($hall_id);
-			$trainigszeit->set_comment($comment);
-			$trainigszeit->save();
+			$note = $_POST['note'];
+			$trainigtime = \handball\Trainingtime::get_by_id($edit_id);
+			$trainigtime->set_team($team_id);
+			$trainigtime->set_loca0ion($location);
+			$tra0nigszeit->set_note($note);
+			$trainigtime->save();
 		}
 		
-		echo "<h3>Hallen</h3>";
-		echo "<strong>Hinweis:</strong> Hallen können (noch) nicht geändert, nur gelöscht werden.<br><br>";
-		$alle_hallen = \handball\Halle::get_all ();
-		$alle_mannschaften = \handball\Mannschaft::get_all ();
+		echo "<h3>Trainingsorte</h3>";
+		echo "<strong>Hinweis:</strong> Trainingsorte können (noch) nicht geändert, nur gelöscht werden.<br><br>";
+		$all_locations = \handball\Location::get_all ();
+		$all_teams = \handball\Team::get_all ();
 		?>
 		<script type="text/javascript">
         // siehe http://fullcalendar.io/docs/
@@ -81,44 +80,42 @@ class ManageTrainingTimes{
         	var originalColorOfSelectedEvent = '';
         	var originalTextColorOfSelectedEvent = '';
 
-            var unassignedHallenzeiten = {
+            var trainingTimesWithoutLocation = {
 				color: unassignedColor,
 				events:
 					[
 					<?php 
-					require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
-					$unassignedTrainingTimes = Trainingszeit::get('halle is null');
-					$fullcalender_events = Trainingszeit::get_fullcalender_io_events($unassignedTrainingTimes);
+					$unassignedTrainingtimes = Trainingtime::get('location is null');
+					$fullcalender_events = Trainingtime::get_fullcalender_io_events($unassignedTrainingtimes);
 					echo implode(", \n", $fullcalender_events);
 					?>
 					]
             };
             <?php 
-            // erstellen der Event-Sources für alle zugewiesenen Hallenzeiten
-			require_once (HANDBASE_PLUGIN_DIR . '/classes/Halle.php');
-            foreach($alle_hallen as $halle){
+            // erstellen der Event-Sources für alle zugewiesenen Triingszeiten
+            foreach($all_locations as $location){
             	echo 'var '
-					.$halle->get_fullcalendar_io_event_source_name()
+					.$location->get_fullcalendar_io_event_source_name()
 	            	.' = '
-					.$halle->get_trainingszeiten_as_fullcalendar_io_event_source()
+					.$location->get_trainingtimes_as_fullcalendar_io_event_source()
 					.";\n";
             }
             ?>
 
             var allEventSources = [ 
             	<?php 
-                $hallenzeitenVariableNames = array('unassignedHallenzeiten');
-                foreach($alle_hallen as $halle){
-                	$hallenzeitenVariableNames[] = $halle->get_fullcalendar_io_event_source_name();	
+                $trainingTimesVariableNames = array('trainingTimesWithoutLocation');
+                foreach($all_locations as $location){
+                	$trainingTimesVariableNames[] = $location->get_fullcalendar_io_event_source_name();	
                 }
-                echo implode(',', $hallenzeitenVariableNames)
+                echo implode(',', $trainingTimesVariableNames)
                 ?>
 			];
             var teamVisibility = new Array();
             teamVisibility["Kein Team"] = true;
 <?php 
-            foreach($alle_mannschaften as $mannschaft){
-            	echo "            teamVisibility[\"".$mannschaft->get_name()."\"] = true;\n";
+            foreach($all_teams as $team){
+            	echo "            teamVisibility[\"".$team->get_name()."\"] = true;\n";
 			}
 ?>
             function toggleTeam(teamName, visible){
@@ -168,16 +165,16 @@ class ManageTrainingTimes{
                     },
                     dayClick: function(date, jsEvent, view) {
 
-                        var newTrainingszeit = {
-                                title: 'Training',
+                        var newTrainingtime = {
+                                title: 'kein Team',
                                 start: date.format(),
                                 end: date.add(90, 'minutes').format()
                         }; 
-                        createTraningszeitOnServer(newTrainingszeit, function(createdId){
-                            $('#calendar').fullCalendar('removeEventSource', unassignedHallenzeiten);
-                            newTrainingszeit.id = createdId;
-                            unassignedHallenzeiten.events.push(newTrainingszeit);
-                            $('#calendar').fullCalendar('addEventSource', unassignedHallenzeiten);
+                        createTraningszeitOnServer(newTrainingtime, function(createdId){
+                            $('#calendar').fullCalendar('removeEventSource', trainingTimesWithoutLocation);
+                            newTrainingtime.id = createdId;
+                            trainingTimesWithoutLocation.events.push(newTrainingtime);
+                            $('#calendar').fullCalendar('addEventSource', trainingTimesWithoutLocation);
 
                         });
 
@@ -203,22 +200,22 @@ class ManageTrainingTimes{
                     $('#calendar').fullCalendar('updateEvent', event);
                     $('#edit_id').val(event.id);
                     $('#delete_id').val(event.id);
-                    $('#edit_mannschaft').val(event.mannschaft);
-                    $('#edit_halle').val(event.halle);
-                    $('#edit_comment').val(event.comment);
+                    $('#edit_team_id').val(event.team_id);
+                    $('#edit_location_id').val(event.location_id);
+                    $('#edit_note').val(event.note);
                 }
                 
             });
 
-            function createTraningszeitOnServer(trainingszeit, trainingszeitWasCreated){
-                var data = eventToAJAXData(trainingszeit);
-                data['action'] = 'add_trainingszeit';
+            function createTraningszeitOnServer(trainingtime, trainingtimeWasCreated){
+                var data = eventToAJAXData(trainingtime);
+                data['action'] = 'add_trainingtime';
                 
                 // since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
                 jQuery.post(ajaxurl, data, function(response) {
-                    trainingszeitCreated = JSON.parse(response);
-                    if(trainingszeitCreated != 'undefined' && trainingszeitWasCreated){
-                    	trainingszeitWasCreated(trainingszeitCreated.id);
+                    trainingtimeCreated = JSON.parse(response);
+                    if(trainingtimeCreated != 'undefined' && trainingtimeWasCreated){
+                    	trainingtimeWasCreated(trainingtimeCreated.id);
                     }else{
 						alert("Die Trainingszeit konnte nicht angelegt werden:\n"+response);
                     }
@@ -237,20 +234,20 @@ class ManageTrainingTimes{
 			}
             
 
-            function changeStart(trainingszeit, callBackFunctionOnSuccess, callBackFunctionOnFailure){
-                start = moment(trainingszeit.start);
+            function changeStart(trainingtime, callBackFunctionOnSuccess, callBackFunctionOnFailure){
+                start = moment(trainingtime.start);
                 var data = {
                 	'action': 'change_start',
-					'id': trainingszeit.id,
+					'id': trainingtime.id,
 					'time': start.format('H:mm'),
                     'weekday': start.locale('en').format('dddd')
                 }
                 jQuery.post(ajaxurl, data, function(response) {
                     try{
-	                    trainingszeitCreated = JSON.parse(response);
-	                    if(trainingszeitCreated != 'undefined'){
+	                    trainingtimeCreated = JSON.parse(response);
+	                    if(trainingtimeCreated != 'undefined'){
 	                        if(callBackFunctionOnSuccess){
-	                        	callBackFunctionOnSuccess(trainingszeitCreated);
+	                        	callBackFunctionOnSuccess(trainingtimeCreated);
 	                        }
 	                    }else{
 	                        if(callBackFunctionOnFailure){
@@ -266,20 +263,20 @@ class ManageTrainingTimes{
                     }
                 });
             }
-            function changeDuration(trainingszeit, callBackFunctionOnSuccess, callBackFunctionOnFailure){
-                start = moment(trainingszeit.start);
-                end = moment(trainingszeit.end);
+            function changeDuration(trainingtime, callBackFunctionOnSuccess, callBackFunctionOnFailure){
+                start = moment(trainingtime.start);
+                end = moment(trainingtime.end);
                 var data = {
                     'action': 'change_duration',
-    				'id': trainingszeit.id,
+    				'id': trainingtime.id,
                     'duration': end.diff(start, 'minutes')
                 };
                 jQuery.post(ajaxurl, data, function(response) {
                     try{
-	                    trainingszeitCreated = JSON.parse(response);
-	                    if(trainingszeitCreated != 'undefined'){
+	                    trainingtimeCreated = JSON.parse(response);
+	                    if(trainingtimeCreated != 'undefined'){
 	                        if(callBackFunctionOnSuccess){
-	                        	callBackFunctionOnSuccess(trainingszeitCreated);
+	                        	callBackFunctionOnSuccess(trainingtimeCreated);
 	                        }
 	                    }else{
 	                        if(callBackFunctionOnFailure){
@@ -296,7 +293,7 @@ class ManageTrainingTimes{
                 });
             }
 
-            function toggleHall(eventSource, visible){
+            function toggleLocation(eventSource, visible){
 	            fullcalendarAction = visible ? 'addEventSource': 'removeEventSource';
                 jQuery('#calendar').fullCalendar(fullcalendarAction, eventSource);
             }
@@ -306,28 +303,28 @@ class ManageTrainingTimes{
         <form method="post">
         <table>
             <tr>
-                <th>Halle</th>
+                <th>Trainingsort</th>
                 <th>Abkürzung</th>
                 <th>Adresse</th>
                 <th>Farbe</th>
                 <td></td>
             </tr>
-            <?php foreach ( $alle_hallen as $hall ) { ?>
+            <?php foreach ( $all_locations as $location ) { ?>
             <tr>
-	            <td><?php echo $hall->get_name(); ?></td>
-	            <td><?php echo $hall->get_abkuerzung(); ?></td>
-	            <td><?php echo $hall->get_adresse(); ?></td>
-	            <td><?php echo $hall->get_color(); ?></td>
+	            <td><?php echo $location->get_name(); ?></td>
+	            <td><?php echo $location->get_abbreviation(); ?></td>
+	            <td><?php echo $location->get_address(); ?></td>
+	            <td><?php echo $location->get_color(); ?></td>
 	            <td><a
-	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&deleteHall=<?php echo $hall->get_id(); ?>">Löschen</a></td>
+	                href="admin.php?page=<?php echo static::$MENU_SLUG;?>&delete_location_id=<?php echo $location->get_id(); ?>">Löschen</a></td>
             </tr>
             <?php } ?>
 	        <tr>
-	            <td><input type="text" name="Hallenname" placeholder="Name"></td>
-	            <td><input type="text" name="Hallenabkuerzung" placeholder="Abkürzung"></td>
-	            <td><input type="text" name="Adresse" placeholder="Adresse"></td>
+	            <td><input type="text" name="location_name" placeholder="Name"></td>
+	            <td><input type="text" name="location_abbreviation" placeholder="Abkürzung"></td>
+	            <td><input type="text" name="location_address" placeholder="Adresse"></td>
 	            <td><input type="text" name="Farbe" placeholder="Farbe"></td>
-	            <td><input type="hidden" name="createHall" value="true">
+	            <td><input type="hidden" name="create_location" value="true">
 	                <?php submit_button('Anlegen', 'primary','Anlegen', false); ?></td>
 	        </tr>
         </table>
@@ -335,39 +332,38 @@ class ManageTrainingTimes{
 
 		<br clear="all" />
 		<h3>Trainingszeiten</h3>
-        <div id="hallen" style="max-width:900px; margin: 0.8em 2em;">
-        <?php foreach($alle_hallen as $halle){
-            $id = 'halle_'.$halle->get_id();
-            echo '<span style="background-color: '.$halle->get_color().'; color: white; padding: 3px; margin: 5px;"><label for="checkbox'.$id.'">'.$halle->get_abkuerzung().'&nbsp;</label>';
-            echo '<input type="checkbox" id="checkbox'.$id.'" value="'.$id.'" onchange="toggleHall('.$halle->get_fullcalendar_io_event_source_name().', this.checked)" checked></span>';
+        <div id="location" style="max-width:900px; margin: 0.8em 2em;">
+        <?php foreach($all_locations as $location){
+            $checkbox_id = 'checkbox_location_'.$location->get_id();
+            echo '<span style="background-color: '.$location->get_color().'; color: white; padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$location->get_abbreviation().'&nbsp;</label>';
+            echo '<input type="checkbox" id="'.$checkbox_id.'" value="'.$checkbox_id.'" onchange="toggleLocation('.$location->get_fullcalendar_io_event_source_name().', this.checked)" checked></span>';
         } ?>
         	<span style="background-color: red; color:white; padding: 3px; margin: 5px;">
-        		<label for="checkboxUnassignedHall"><i>(ohne Halle)</i>&nbsp;</label>
-        		<input type="checkbox" id="checkboxUnassignedHall" value="(ohne Halle)" onchange="toggleHall(unassignedHallenzeiten, this.checked)" checked>
+        		<label for="checkbox_location_unassigned"><i>(ohne Trainigsort)</i>&nbsp;</label>
+        		<input type="checkbox" id="checkbox_location_unassigned" value="(ohne Trainingsort)" onchange="toggleLocation(trainingTimesWithoutLocation, this.checked)" checked>
         	</span>
         </div>
-        <div id="mannschaften" style="max-width:900px; margin: 0.8em 2em;">
-            Folgende <b>Mannschaften</b> anzeigen:<br>
-	        <?php foreach($alle_mannschaften as $mannschaft){
-	            $id = 'mannschaft_'.$mannschaft->get_id();
-	            echo '<span style="padding: 3px; margin: 5px;"><label for="'.$id.'">'.$mannschaft->get_name().'</label>';
-	            echo '<input type="checkbox" id="'.$id.'" value="'.$id.'" onchange="toggleTeam(\''.$mannschaft->get_name().'\', this.checked);" checked></span>';
+        <div id="teams" style="max-width:900px; margin: 0.8em 2em;">
+	        <?php foreach($all_teams as $team){
+	            $checkbox_id = 'checkbox_team_'.$team->get_id();
+	            echo '<span style="padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$team->get_name().'&nbsp;</label>';
+	            echo '<input type="checkbox" id="'.$checkbox_id.'" value="'.$checkbox_id.'" onchange="toggleTeam(\''.$team->get_name().'\', this.checked);" checked></span>';
 	        } ?>
 	        <span style="padding: 3px; margin: 5px;">
         		<label for="checkboxNoTeam"><i>(Kein Team)</i>&nbsp;</label>
-        		<input type="checkbox" id="checkboxNoTeam" value="(ohne Halle)" onchange="toggleTeam('Kein Team', this.checked)" checked>
+        		<input type="checkbox" id="checkboxNoTeam" value="(ohne Trainingsort)" onchange="toggleTeam('Kein Team', this.checked)" checked>
         	</span>
         </div>
         <div id="currenttermin" style="margin: 1em 2em 0em; padding: 0.5em; background: white;  display:inline-block; ">
             <b>Aktuell ausgewählt:</b><br>
             <form method="post">
             <?php
-            	echo \handball\input\team_select('team_id', 'edit_mannschaft'); 
-            	echo \handball\input\hall_select('hall_id', 'edit_halle');
+            	echo \handball\input\team_select('team_id', 'edit_team_id'); 
+            	echo \handball\input\location_Select('location_id', 'edit_location_id');
             ?>
             <br>
             <b>Trainingshinweis:</b><br>
-            <textarea name="comment" id="edit_comment"></textarea><br>
+            <textarea name="note" id="edit_note"></textarea><br>
             <input type="hidden" name="edit_id" id="edit_id" value="-1" size="3">
              <?php submit_button('Speichern', 'primary','Speichern', false); ?>
             </form>
@@ -392,30 +388,28 @@ class ManageTrainingTimes{
         <?php 
         
     }
-    public static function add_trainingszeit() {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
+    public static function add_trainingtime() {
        	$weekDay = $_POST ['weekday'];
        	$time = $_POST['time'];
        	$duration =  intval ( $_POST ['duration'] );
-       	$trainigszeit = new Trainingszeit($weekDay, $time, $duration);
-       	echo $trainigszeit->toJSON();
+       	$trainigtime = new Trainingtime($weekDay, $time, $duration);
+       	echo $trainigtime->toJSON();
        	wp_die ();
     }
     public static function change_start() {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
        	$id = intval($_POST ['id']);
        	$time = $_POST['time'];
        	$weekDay = $_POST ['weekday'];
        	
-       	$trainigszeit = Trainingszeit::get_by_id($id);
-       	if(is_null($trainigszeit)){
+       	$trainingtime = Trainingtime::get_by_id($id);
+       	if(is_null($trainingtime)){
        		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
        		wp_die();
        	}
-       	$trainigszeit->set_uhrzeit($time);
-       	$trainigszeit->set_wochentag($weekDay);
-       	if($trainigszeit->save()){
-       		echo $trainigszeit->toJSON();
+       	$trainingtime->set_time($time);
+       	$trainingtime->set_weekday($weekDay);
+       	if($trainingtime->save()){
+       		echo $trainingtime->toJSON();
        	}else{
        		global $wpdb;
        		echo "Fehler beim Speichern der neuen Startzeit:\n";
@@ -424,18 +418,17 @@ class ManageTrainingTimes{
        	wp_die ();
     }
     public static function change_duration() {
-		require_once (HANDBASE_PLUGIN_DIR . '/classes/Trainingszeit.php');
        	$id = intval($_POST ['id']);
        	$duration = intval($_POST['duration']);
        	
-       	$trainigszeit = Trainingszeit::get_by_id($id);
-       	if(is_null($trainigszeit)){
+       	$trainingtime = Trainingtime::get_by_id($id);
+       	if(is_null($trainingtime)){
        		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
        		wp_die();
        	}
-       	$trainigszeit->set_dauer($duration);
-       	if($trainigszeit->save()){
-       		echo $trainigszeit->toJSON();
+       	$trainingtime->set_duration_minutes($duration);
+       	if($trainingtime->save()){
+       		echo $trainingtime->toJSON();
        	}else{
        		global $wpdb;
        		echo "Fehler beim Speichern der neuen Trainingsdauer:\n";

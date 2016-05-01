@@ -1,22 +1,14 @@
 <?php
 
 namespace handball;
-require_once("Spielposition.php");
 
-class Handballer{
+require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Position.php');
+
+class Player{
 	
 	private $id;
 	/** Auf welcher Position spielt dieser Spieler? */
-	private $positionen;
-	
-	/** Hauptmannschaft, in der man drin ist */
-	private $stammmanschaft;
-	
-	/** Mannschaft, in die man rein möchte (überschreibt stammmannschaft) */
-	private $wunschmannschaft;
-	
-	/** Mannschaften, die man "abonniert" hat */
-	private $zusatzmannschaften;
+	private $positions;
 	
 	public function __construct($user_id){
 		if(!is_int($user_id)){
@@ -37,8 +29,8 @@ class Handballer{
 		<table class="form-table">
 			<?php
 				$this->show_position_checkboxes ();
-				$this->list_stammmannschaften ();
-				$this->list_zusatzmannschaften ();
+				$this->list_main_teams ();
+				$this->list_additional_teams ();
 			?>
 		</table>
 		<?php
@@ -54,14 +46,14 @@ class Handballer{
 			</th>
 			<td>
 				<fieldset><?php 
-					foreach(Spielposition::alle_positionen() as $position){
-						$abkuerzung = $position->get_abkuerzung();
-						$bezeichnung = $position->get_bezeichnung();
+					foreach(Position::alle_positionen() as $position){
+						$abbreviation = $position->get_abbreviation();
+						$name = $position->get_name();
 						$checked = $this->plays_on_position($position)?'checked':'';
 						$disabled = $enabled ? "":"disabled";
-						echo '<label for="'.$abkuerzung.'">';
-						echo '<input type="checkbox" name="position_'.$abkuerzung.'" value="true" id="'.$abkuerzung.'" '.$checked.' '.$disabled.'>';
-						echo $bezeichnung.' </label>'; 
+						echo '<label for="'.$abbreviation.'">';
+						echo '<input type="checkbox" name="position_'.$abbreviation.'" value="true" id="'.$abbreviation.'" '.$checked.' '.$disabled.'>';
+						echo $name.' </label>'; 
 					}
 				?></fieldset>
 				<span class="description">
@@ -73,17 +65,17 @@ class Handballer{
 		
 	
 	public function plays_on_position($position){
-		if(is_null($this->positionen)){
-			$this->load_positionen();
+		if(is_null($this->positions)){
+			$this->load_positions();
 		}
-		return in_array($position, $this->positionen);
+		return in_array($position, $this->positions);
 	}
 	
-	private function load_positionen(){
-		$this->positionen = array();
-		foreach (Spielposition::alle_positionen() as $position){
+	private function load_positions(){
+		$this->positions = array();
+		foreach (Position::alle_positionen() as $position){
 			if($this->get_meta($position->get_meta_name())){
-				$this->positionen[] = $position;
+				$this->positions[] = $position;
 			}	
 		}
 	}
@@ -93,30 +85,30 @@ class Handballer{
 	}
 	
 	public function plays_position($position){
-		if(! ($position instanceof Spielposition) ){
+		if(! ($position instanceof Position) ){
 			throw new \Exception($position.' ist keine Spielposition');	
 		}
-		$this->ensure_spielposition($position);
+		$this->ensure_position($position);
 		if(!$this->plays_on_position($position)){
-			$this->positionen[] = $position;
+			$this->positions[] = $position;
 		}
 	}
 	
 	public function does_not_play_on_position($position){
-		if(! ($position instanceof Spielposition) ){
+		if(! ($position instanceof Position) ){
 			throw new \Exception($position.' ist keine Spielposition');	
 		}
-		$this->ensure_spielposition($position);
-		if(is_null($this->positionen)){
-			$this->load_positionen();
+		$this->ensure_position($position);
+		if(is_null($this->positions)){
+			$this->load_positions();
 		}
-		if(($key = array_search($position, $this->positionen)) !== false) {
-			unset($this->positionen[$key]);
+		if(($key = array_search($position, $this->positions)) !== false) {
+			unset($this->positions[$key]);
 		}
 	}
 	
-	private function ensure_spielposition($position){
-		if(! ($position instanceof Spielposition)){
+	private function ensure_position($position){
+		if(! ($position instanceof Position)){
 			ob_start();
 			throw new Exception("Position ist murks: " + $ob_get_clean());
 		}
@@ -133,9 +125,9 @@ class Handballer{
 	}
 	
 	private function get_position_from_post(){
-		foreach(Spielposition::alle_positionen() as $position){
-			$abkuerzung = $position->get_abkuerzung();
-			$position_field_name = 'position_'.$abkuerzung;
+		foreach(Position::alle_positionen() as $position){
+			$abbreviation = $position->get_abkuerzung();
+			$position_field_name = 'position_'.$abbreviation;
 			if(isset($_POST[$position_field_name])){
 				$plays_on_position = $_POST[$position_field_name];
 				if($plays_on_position){
@@ -150,12 +142,12 @@ class Handballer{
 	}
 	
 	public function save(){
-		$this->save_positionen();
+		$this->save_positions();
 	}
 	
-	private function save_positionen(){
-		var_dump($this->positionen);
-		foreach(Spielposition::alle_positionen() as $position){
+	private function save_positions(){
+		var_dump($this->positions);
+		foreach(Position::alle_positionen() as $position){
 			if($this->plays_on_position($position)){
 				$this->set_meta($position->get_meta_name(), true);
 			}else{
@@ -171,51 +163,51 @@ class Handballer{
 		delete_user_meta( $this->id, $key );
 	}
 
-	public function get_stammmannschaften(){
+	public function get_main_teams(){
 		$teams = array();
 
 		global $wpdb;
-		$sql = "SELECT team FROM ". Mannschaft::table_stammspieler()." WHERE user=$this->id";
+		$sql = "SELECT team FROM ". Team::table_main_players()." WHERE user=$this->id";
 		foreach($wpdb->get_results($sql) as $row){
-			$teams[] = Mannschaft::get_by_id($row->team);
+			$teams[] = Team::get_by_id($row->team);
 		}
 		
 		return $teams;
 	}
-	public function get_zusatzmannschaften(){
+	public function get_additional_teams(){
 		$teams = array();
 
 		global $wpdb;
-		$sql = "SELECT team FROM ". Mannschaft::table_zusatzspieler()." WHERE user=$this->id";
+		$sql = "SELECT team FROM ". Team::table_additional_players()." WHERE user=$this->id";
 		foreach($wpdb->get_results($sql) as $row){
-			$teams[] = Mannschaft::get_by_id($row->team);
+			$teams[] = Team::get_by_id($row->team);
 		}
 		
 		return $teams;
 	}
-	public function list_stammmannschaften(){
+	public function list_main_teams(){
 		?><tr>
 			<th>
-				<label for="stammmannschaft">Stammmannschaften</label>
+				<label for="main_teams">Stammmannschaften</label>
 			</th>
 			<td>
 				<?php 
-				foreach ($this->get_stammmannschaften() as $stammmannschaft){
-					echo $stammmannschaft->get_name()."<br>";	
+				foreach ($this->get_main_teams() as $main_team){
+					echo $main_team->get_name()."<br>";	
 				}
 				?>
 			</td>
 		</tr><?php 
 	}
-	public function list_zusatzmannschaften(){
+	public function list_additional_teams(){
 		?><tr>
 			<th>
-				<label for="zusatzmannschaft">Weitere Mannschaften</label>
+				<label for="additional_teams">Weitere Mannschaften</label>
 			</th>
 			<td>
 				<?php
-				foreach ($this->get_zusatzmannschaften() as $zusatzmannschaft){
-					echo $zusatzmannschaft->get_name()."<br>";
+				foreach ($this->get_additional_teams() as $additional_team){
+					echo $additional_team->get_name()."<br>";
 				}
 				?>
 			</td>
@@ -227,30 +219,30 @@ class Handballer{
 		return $wpdb->prefix."users";
 	}
 	
-	public static function ensure_handballer($handballer){
-		if(is_null($handballer)){
-			return $handballer;
+	public static function ensure_player($player){
+		if(is_null($player)){
+			return $player;
 		}
-		if(is_int($handballer)){
-			return $handballer;
+		if(is_int($player)){
+			return $player;
 		}
-		if($handballer instanceof Handballer){
-			return $handballer;
+		if($player instanceof Player){
+			return $player;
 		}
-		throw new \Exception($handballer.' ist weder null, noch eine id, noch ein Handballer');
+		throw new \Exception($player.' ist weder null, noch eine id, noch ein Spieler');
 	}
 	
-	public static function as_id_or_null($handballer){
-		if(is_null($handballer)){
+	public static function as_id_or_null($player){
+		if(is_null($player)){
 			return null;
 		}
-		if(is_int($handballer)){
-			return $handballer;
+		if(is_int($player)){
+			return $player;
 		}
-		if($handballer instanceof Handballer){
-			return $handballer->id;
+		if($player instanceof Player){
+			return $player->id;
 		}
-		throw new \Exception($handballer.' ist weder eine id, noch ein Handballer');
+		throw new \Exception($player.' ist weder eine id, noch ein Spieler');
 	}
 }
 ?>

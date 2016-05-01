@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
                 Multiselect.right.eq(0).append(left_options);
 
                 for(i=0; i < options.length; i++){
-                    addStammspieler(options[i].value);
+                    add_main_player(options[i].value);
                 }
 
                 if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
@@ -25,7 +25,7 @@ jQuery(document).ready(function($) {
                 Multiselect.right.eq(1).append(left_options);
 
                 for(i=0; i < options.length; i++){
-                    addZusatzspieler(options[i].value);
+                    add_additional_player(options[i].value);
                 }
 
                 if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
@@ -42,7 +42,7 @@ jQuery(document).ready(function($) {
                 Multiselect.left.append(right_options);
 
                 for(i=0; i < options.length; i++){
-                    removeStammspieler(options[i].value);
+                    remove_main_player(options[i].value);
                 }
 
                 if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
                 Multiselect.left.append(right_options);
 
                 for(i=0; i < right_options.length; i++){
-                    removeStammspieler(right_options[i].value);
+                    remove_main_player(right_options[i].value);
                 }
 
                 if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
@@ -64,7 +64,7 @@ jQuery(document).ready(function($) {
                 Multiselect.left.append(right_options);
 
                 for(i=0; i < options.length; i++){
-                    removeZusatzspieler(options[i].value);
+                    remove_additional_player(options[i].value);
                 }
 
                 if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
@@ -75,7 +75,7 @@ jQuery(document).ready(function($) {
                 Multiselect.left.append(right_options);
 
                 for(i=0; i < right_options.length; i++){
-                    removeZusatzspieler(right_options[i].value);
+                    remove_additional_player(right_options[i].value);
                 }
 
                 if ( typeof Multiselect.callbacks.sort == 'function' && !silent ) {
@@ -85,53 +85,55 @@ jQuery(document).ready(function($) {
         }
     });
 });
-function addStammspieler(nutzerID){
+function add_main_player(user_id){
     var data = {
-            'action': 'add_stammspieler',
-            'team': teamid,
-            'user': nutzerID
+            'action': 'add_main_player',
+            'team_id': team_id,
+            'user_id': user_id
     };
     jQuery.post(ajaxurl, data, function(response) {
-        if(response != nutzerID){
-            alert("Der Stammspieler konnte nicht hinzugefügt werden: " + response + " statt " + nutzerID);
+        if(response != user_id){
+            alert("Der Stammspieler konnte nicht hinzugefügt werden: " + response + " statt " + user_id);
         }
     });
 }
-function removeStammspieler(nutzerID){
+function remove_main_player(user_id){
+	console.log('remove: '+user_id);
     var data = {
-            'action': 'remove_stammspieler',
-            'team': teamid,
-            'user': nutzerID
+            'action': 'remove_main_player',
+            'team_id': team_id,
+            'user_id': user_id
     };
     jQuery.post(ajaxurl, data, function(response) {
-        if(response != nutzerID){
-            alert("Der Stammspieler konnte nicht entfernt werden: " + response + " statt " + nutzerID);
+    	console.log("response: "+response);
+        if(response != user_id){
+            alert("Der Stammspieler konnte nicht entfernt werden: " + response + " statt " + user_id);
         }
     });
 }
-function addZusatzspieler(nutzerID){
+function add_additional_player(user_id){
     var data = {
-            'action': 'add_zusatzspieler',
-            'team': teamid,
-            'user': nutzerID
+            'action': 'add_additional_player',
+            'team_id': team_id,
+            'user_id': user_id
     };
 
     jQuery.post(ajaxurl, data, function(response) {
-        if(response != nutzerID){
-            alert("Der Stammspieler konnte nicht hinzugefügt werden: " + response + " statt " + nutzerID);
+        if(response != user_id){
+            alert("Der zusätzliche Spieler konnte nicht hinzugefügt werden: " + response + " statt " + user_id);
         }
     });
 }
-function removeZusatzspieler(nutzerID){
+function remove_additional_player(user_id){
     var data = {
-            'action': 'remove_zusatzspieler',
-            'team': teamid,
-            'user': nutzerID
+            'action': 'remove_additional_player',
+            'team_id': team_id,
+            'user_id': user_id
     };
 
     jQuery.post(ajaxurl, data, function(response) {
-        if(response != nutzerID){
-            alert("Der Stammspieler konnte nicht entfernt werden: " + response + " statt " + nutzerID);
+        if(response != user_id){
+            alert("Der zusätzliche Spieler konnte nicht entfernt werden: " + response + " statt " + user_id);
         }
     });
 }
