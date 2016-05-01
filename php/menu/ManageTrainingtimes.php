@@ -62,7 +62,7 @@ class ManageTrainingtimes{
 			$note = $_POST['note'];
 			$trainigtime = \handball\Trainingtime::get_by_id($edit_id);
 			$trainigtime->set_team($team_id);
-			$trainigtime->set_loca0ion($location);
+			$trainigtime->set_location($location);
 			$tra0nigszeit->set_note($note);
 			$trainigtime->save();
 		}
