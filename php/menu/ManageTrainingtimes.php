@@ -344,10 +344,9 @@ class ManageTrainingtimes{
         	</span>
         </div>
         <div id="teams" style="max-width:900px; margin: 0.8em 2em;">
-            Folgende <b>Mannschaften</b> anzeigen:<br>
 	        <?php foreach($all_teams as $team){
 	            $checkbox_id = 'checkbox_team_'.$team->get_id();
-	            echo '<span style="padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$team->get_name().'</label>';
+	            echo '<span style="padding: 3px; margin: 5px;"><label for="'.$checkbox_id.'">'.$team->get_name().'&nbsp;</label>';
 	            echo '<input type="checkbox" id="'.$checkbox_id.'" value="'.$checkbox_id.'" onchange="toggleTeam(\''.$team->get_name().'\', this.checked);" checked></span>';
 	        } ?>
 	        <span style="padding: 3px; margin: 5px;">
