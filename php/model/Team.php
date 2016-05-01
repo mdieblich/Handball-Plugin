@@ -3,8 +3,8 @@
 namespace handball;
 
 require_once(ABSPATH.'wp-admin/includes/upgrade.php');
-require_once(HANDBASE_PLUGIN_DIR.'/php/classes/WPDBObject.php');
-require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Player.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/model/WPDBObject.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/model/Player.php');
 
 /**
  * TODO Datenbank-Schema-Upgrade: https://codex.wordpress.org/Creating_Tables_with_Plugins

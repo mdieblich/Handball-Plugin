@@ -2,7 +2,7 @@
 
 namespace handball;
 
-require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Position.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/model/Position.php');
 
 class Player{
 	

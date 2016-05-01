@@ -29,9 +29,9 @@ add_action( 'show_user_profile', 'handball\show_extra_profile_fields' );
 add_action( 'edit_user_profile', 'handball\show_extra_profile_fields' );
 
 function activate(){
-	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Team.php');
-	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Location.php');
-	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Trainingtime.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/model/Team.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/model/Location.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/model/Trainingtime.php');
 	
 	Team::install();
 	Location::install();
@@ -39,18 +39,18 @@ function activate(){
 }
 
 function deactivate(){
-// 	require_once 'classes/Team.php';
+// 	require_once 'model/Team.php';
 // 	Team::uninstall();
 }
 
 function show_extra_profile_fields( $user ) {
-	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Player.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/model/Player.php');
 	$player = new Player($user->ID);
 	$player->show_profile_extras();
 }
 
 function save_extra_profile_fields( $user_id ) {
-	require_once (HANDBASE_PLUGIN_DIR . '/php/classes/Player.php');
+	require_once (HANDBASE_PLUGIN_DIR . '/php/model/Player.php');
 	if ( !current_user_can( 'edit_user', $user_id ) )
 		return false;
 	

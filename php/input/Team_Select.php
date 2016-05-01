@@ -2,7 +2,7 @@
 namespace handball\input;
 
 use handball\Team;
-require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Team.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/model/Team.php');
 
 function team_select($name, $html_id=null, $onchange=null, $select=-1){
 	$onchange = (is_null($onchange)) ? '': 'onchange="'.$onchange.'"';

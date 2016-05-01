@@ -4,7 +4,7 @@ namespace handball\menu;
 
 use handball\Team;
 
-require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Team.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/model/Team.php');
 require_once (HANDBASE_PLUGIN_DIR.'/php/input/Team_Select.php');
 require_once (HANDBASE_PLUGIN_DIR.'/php/input/User_Select.php');
 

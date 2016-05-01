@@ -3,7 +3,7 @@ namespace handball\menu;
 
 use handball\Player;
 
-require_once(HANDBASE_PLUGIN_DIR.'/php/classes/Player.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/model/Player.php');
 
 class Hauptmenu{
 

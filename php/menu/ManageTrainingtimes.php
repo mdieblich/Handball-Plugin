@@ -3,9 +3,9 @@ namespace handball\menu;
 
 use handball\Trainingtime; // TODO kann weg?
 
-require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Location.php');
-require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Team.php');
-require_once (HANDBASE_PLUGIN_DIR.'/php/classes/Trainingtime.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/model/Location.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/model/Team.php');
+require_once (HANDBASE_PLUGIN_DIR.'/php/model/Trainingtime.php');
 require_once (HANDBASE_PLUGIN_DIR.'/php/input/Team_Select.php');
 require_once (HANDBASE_PLUGIN_DIR.'/php/input/Location_Select.php');
 

@@ -2,7 +2,7 @@
 namespace handball;
 
 require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-require_once(HANDBASE_PLUGIN_DIR.'/php/classes/WPDBObject.php');
+require_once(HANDBASE_PLUGIN_DIR.'/php/model/WPDBObject.php');
 
 class Trainingtime extends WPDBObject{
 	
