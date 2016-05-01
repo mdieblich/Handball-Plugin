@@ -35,7 +35,7 @@ class ManageTrainingtimes{
 	
 	public function create_manage_training_times_page(){
 		if (isset ( $_POST ['create_location'] )) {
-			$new_location = new \handball\Location( 
+			new \handball\Location( 
 					$_POST ['location_name'], 
 					$_POST ['location_abbreviation'], 
 					$_POST ['location_address'],
@@ -60,11 +60,11 @@ class ManageTrainingtimes{
 				$location = intval($_POST['location_id']);
 			}
 			$note = $_POST['note'];
-			$trainigszeit = \handball\Trainingtime::get_by_id($edit_id);
-			$trainigszeit->set_team($team_id);
-			$trainigszeit->set_location($location);
-			$trainigszeit->set_note($note);
-			$trainigszeit->save();
+			$trainigtime = \handball\Trainingtime::get_by_id($edit_id);
+			$trainigtime->set_team($team_id);
+			$trainigtime->set_loca0ion($location);
+			$tra0nigszeit->set_note($note);
+			$trainigtime->save();
 		}
 		
 		echo "<h3>Trainingsorte</h3>";
@@ -393,8 +393,8 @@ class ManageTrainingtimes{
        	$weekDay = $_POST ['weekday'];
        	$time = $_POST['time'];
        	$duration =  intval ( $_POST ['duration'] );
-       	$trainigszeit = new Trainingtime($weekDay, $time, $duration);
-       	echo $trainigszeit->toJSON();
+       	$trainigtime = new Trainingtime($weekDay, $time, $duration);
+       	echo $trainigtime->toJSON();
        	wp_die ();
     }
     public static function change_start() {
@@ -402,15 +402,15 @@ class ManageTrainingtimes{
        	$time = $_POST['time'];
        	$weekDay = $_POST ['weekday'];
        	
-       	$trainigszeit = Trainingtime::get_by_id($id);
-       	if(is_null($trainigszeit)){
+       	$trainingtime = Trainingtime::get_by_id($id);
+       	if(is_null($trainingtime)){
        		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
        		wp_die();
        	}
-       	$trainigszeit->set_time($time);
-       	$trainigszeit->set_weekday($weekDay);
-       	if($trainigszeit->save()){
-       		echo $trainigszeit->toJSON();
+       	$trainingtime->set_time($time);
+       	$trainingtime->set_weekday($weekDay);
+       	if($trainingtime->save()){
+       		echo $trainingtime->toJSON();
        	}else{
        		global $wpdb;
        		echo "Fehler beim Speichern der neuen Startzeit:\n";
@@ -422,14 +422,14 @@ class ManageTrainingtimes{
        	$id = intval($_POST ['id']);
        	$duration = intval($_POST['duration']);
        	
-       	$trainigszeit = Trainingtime::get_by_id($id);
-       	if(is_null($trainigszeit)){
+       	$trainingtime = Trainingtime::get_by_id($id);
+       	if(is_null($trainingtime)){
        		echo "Fehler: Die Trainingszeit mit der ID $id konnte nicht gefunden werden.";
        		wp_die();
        	}
-       	$trainigszeit->set_duration_minutes($duration);
-       	if($trainigszeit->save()){
-       		echo $trainigszeit->toJSON();
+       	$trainingtime->set_duration_minutes($duration);
+       	if($trainingtime->save()){
+       		echo $trainingtime->toJSON();
        	}else{
        		global $wpdb;
        		echo "Fehler beim Speichern der neuen Trainingsdauer:\n";

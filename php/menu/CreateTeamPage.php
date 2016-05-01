@@ -40,7 +40,7 @@ class CreateTeamPage {
 		
 		?>
 <script type="text/javascript">
-function setAsCoach(teamID, nutzerID){
+function set_as_coach(teamID, nutzerID){
 	var data = {
 		'action': 'set_coach',
 		'team_id': teamID,
@@ -54,7 +54,7 @@ function setAsCoach(teamID, nutzerID){
 		}
 	});
 }
-function setAsAssistantCoach(teamID, nutzerID){
+function set_as_assistant_coach(teamID, nutzerID){
 	var data = {
 		'action': 'set_assistant_coach',
 		'team_id': teamID,
@@ -86,8 +86,8 @@ function setAsAssistantCoach(teamID, nutzerID){
 			?>
 			        	<tr>
             <td><?php echo $team->get_name(); ?></td>
-            <td><?php echo \handball\input\select_user('coach', 'setAsCoach('.$team->get_id().',this.value)', $team->get_coach()->get_id()); ?></td>
-            <td><?php echo \handball\input\select_user('assistant_coach','setAsAssistantCoach('.$team->get_id().',this.value)', $team->get_assistant_coach()->get_id()); ?></td>
+            <td><?php echo \handball\input\select_user('coach', 'set_as_coach('.$team->get_id().',this.value)', $team->get_coach()->get_id()); ?></td>
+            <td><?php echo \handball\input\select_user('assistant_coach','set_as_assistant_coach('.$team->get_id().',this.value)', $team->get_assistant_coach()->get_id()); ?></td>
             <td><a
                 href="admin.php?page=<?php echo static::$MENU_SLUG;?>&delete_team_id=<?php echo $team->get_id(); ?>">Löschen</a></td>
         </tr>
@@ -113,17 +113,6 @@ function setAsAssistantCoach(teamID, nutzerID){
     </table>
 </div>
 <?php
-	}
-	public static function my_action_callback() {
-		global $wpdb; // this is how you get access to the database
-		
-		$whatever = intval ( $_POST ['whatever'] );
-		
-		$whatever += 10;
-		
-		echo $whatever;
-		
-		wp_die (); // this is required to terminate immediately and return a proper response
 	}
 	public static function set_coach() {
 		$team_id = intval ( $_POST ['team_id'] );
