@@ -42,25 +42,25 @@ class ManageTeamPage {
 	public static function add_stammspieler() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
-		echo \handball\Team::add_stammspieler_to_team( $team_id, $user_id );
+		echo \handball\Team::add_main_player_to_team( $team_id, $user_id );
 		wp_die ();
 	}
 	public static function remove_stammspieler() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
-		echo \handball\Team::remove_stammspieler_from_team( $team_id, $user_id );
+		echo \handball\Team::remove_additional_player_from_team( $team_id, $user_id );
 		wp_die ();
 	}
 	public static function add_zusatzspieler() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
-		echo \handball\Team::add_zusatzspieler_to_team( $team_id, $user_id );
+		echo \handball\Team::add_additional_player_to_team( $team_id, $user_id );
 		wp_die ();
 	}
 	public static function remove_zusatzspieler() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
-		echo \handball\Team::remove_zusatzspieler_from_team( $team_id, $user_id );
+		echo \handball\Team::remove_additional_player_from_team( $team_id, $user_id );
 		wp_die ();
 	}
 }

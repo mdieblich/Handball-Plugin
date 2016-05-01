@@ -12,8 +12,8 @@ class CreateTeamPage {
 				$this,
 				'add_plugin_page' 
 		) );
-		add_action ( 'wp_ajax_set_trainer', 'handball\menu\CreateTeamPage::set_trainer' );
-		add_action ( 'wp_ajax_set_cotrainer', 'handball\menu\CreateTeamPage::set_cotrainer' );
+		add_action ( 'wp_ajax_set_coach', 'handball\menu\CreateTeamPage::set_coach' );
+		add_action ( 'wp_ajax_set_assistant_coach', 'handball\menu\CreateTeamPage::set_assistant_coach' );
 	}
 	public function add_plugin_page() {
 		add_submenu_page ( 'handball', // parent_slug
@@ -30,7 +30,7 @@ class CreateTeamPage {
 	public function create_team_page() {
 		
 		if (isset ( $_POST ['createTeam'] )) {
-			new \handball\Team ( $_POST ['Teamname'], intval($_POST ['Trainer']), intval($_POST ['Cotrainer']) );
+			new \handball\Team ( $_POST ['teamname'], intval($_POST ['coach']), intval($_POST ['assistant_coach']) );
 		}
 		
 		if (isset ( $_GET ['delete_team_id'] )) {
@@ -40,9 +40,9 @@ class CreateTeamPage {
 		
 		?>
 <script type="text/javascript">
-function setAsTrainer(teamID, nutzerID){
+function setAsCoach(teamID, nutzerID){
 	var data = {
-		'action': 'set_trainer',
+		'action': 'set_coach',
 		'team_id': teamID,
 		'user_id': nutzerID
 	};
@@ -54,9 +54,9 @@ function setAsTrainer(teamID, nutzerID){
 		}
 	});
 }
-function setAsCotrainer(teamID, nutzerID){
+function setAsAssistantCoach(teamID, nutzerID){
 	var data = {
-		'action': 'set_cotrainer',
+		'action': 'set_assistant_coach',
 		'team_id': teamID,
 		'user_id': nutzerID
 	};
@@ -86,8 +86,8 @@ function setAsCotrainer(teamID, nutzerID){
 			?>
 			        	<tr>
             <td><?php echo $team->get_name(); ?></td>
-            <td><?php echo \handball\input\select_user('Trainer', 'setAsTrainer('.$team->get_id().',this.value)', $team->get_trainer()->get_id()); ?></td>
-            <td><?php echo \handball\input\select_user('Cotrainer','setAsCotrainer('.$team->get_id().',this.value)', $team->get_cotrainer()->get_id()); ?></td>
+            <td><?php echo \handball\input\select_user('coach', 'setAsCoach('.$team->get_id().',this.value)', $team->get_coach()->get_id()); ?></td>
+            <td><?php echo \handball\input\select_user('assistant_coach','setAsAssistantCoach('.$team->get_id().',this.value)', $team->get_assistant_coach()->get_id()); ?></td>
             <td><a
                 href="admin.php?page=<?php echo static::$MENU_SLUG;?>&delete_team_id=<?php echo $team->get_id(); ?>">Löschen</a></td>
         </tr>
@@ -97,13 +97,13 @@ function setAsCotrainer(teamID, nutzerID){
             		<form method="post">
             <tr>
                 <td><input type="hidden" name="createTeam" value="true">
-                    <input type="text" name="Teamname"
+                    <input type="text" name="teamname"
                     placeholder="Name"></td>
                 <td>
-	            			<?php echo \handball\input\select_user('Trainer'); ?>
+	            			<?php echo \handball\input\select_user('coach'); ?>
 	            		</td>
                 <td>
-	            			<?php echo \handball\input\select_user('Cotrainer'); ?>
+	            			<?php echo \handball\input\select_user('assistant_coach'); ?>
 	            		</td>
                 <td>
 	            			<?php submit_button('Anlegen', 'primary','Anlegen', false); ?>
@@ -125,16 +125,16 @@ function setAsCotrainer(teamID, nutzerID){
 		
 		wp_die (); // this is required to terminate immediately and return a proper response
 	}
-	public static function set_trainer() {
+	public static function set_coach() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
-		echo \handball\Team::set_trainer ( $team_id, $user_id );
+		echo \handball\Team::set_coach ( $team_id, $user_id );
 		wp_die ();
 	}
-	public static function set_cotrainer() {
+	public static function set_assistant_coach() {
 		$team_id = intval ( $_POST ['team_id'] );
 		$user_id = intval ( $_POST ['user_id'] );
-		echo \handball\Team::set_cotrainer ( $team_id, $user_id );
+		echo \handball\Team::set_assistant_coach ( $team_id, $user_id );
 		wp_die ();
 	}
 }

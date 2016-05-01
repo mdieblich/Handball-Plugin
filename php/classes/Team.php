@@ -15,26 +15,26 @@ class Team extends WPDBObject{
 	
 	private $name;
 	
-	private $trainer;
-	private $cotrainer;
+	private $coach;
+	private $assistant_coach;
 	/** Kern der Mannschaft */
 	private $main_players; // 1xN Relation (ein Spieler kann höchstens in einer Mannschaft sein)
 	
 	/** Hier kann sich jeder selbst eintragen */
 	private $additional_players; // NxM Relation (ein Spieler kann beliebig viele Mannschaften "abonnieren")
 	
-	public function __construct($name, $trainer = null, $cotrainer=null, $id=null){
+	public function __construct($name, $coach = null, $assistant_coach=null, $id=null){
 		$this->name = $name;
-		$this->trainer = Player::ensure_player($trainer);
-		$this->cotrainer = Player::ensure_player($cotrainer);
+		$this->coach = Player::ensure_player($coach);
+		$this->assistant_coach = Player::ensure_player($assistant_coach);
 		parent::__construct($id);
 	}
 
 	protected function to_array(){
 		$array = parent::to_array();
 		$array['name'] = $this->name;
-		$array['trainer'] = Player::as_id_or_null($this->trainer);
-		$array['cotrainer'] = Player::as_id_or_null($this->cotrainer);
+		$array['coach'] = Player::as_id_or_null($this->coach);
+		$array['assistant_coach'] = Player::as_id_or_null($this->assistant_coach);
 		return $array;
 	}
 	
@@ -42,39 +42,39 @@ class Team extends WPDBObject{
 		return $this->name;
 	}
 
-	public function get_trainer(){
-		return new Player($this->trainer);
+	public function get_coach(){
+		return new Player($this->coach);
 	}
-	public function get_cotrainer(){
-		return new Player($this->cotrainer);
+	public function get_assistant_coach(){
+		return new Player($this->assistant_coach);
 	}
 	
-	public function is_stammspieler($user){
+	public function is_main_player($user){
 		if(is_null($this->main_players)){
-			$this->load_stammspieler();
+			$this->load_main_players();
 		}
 		return in_array($user->ID, $this->main_players);
 	}
 	
-	private function load_stammspieler(){
+	private function load_main_players(){
 		global $wpdb;
-		$sql = "SELECT user FROM ". static::table_stammspieler()." WHERE team=".$this->get_id();
+		$sql = "SELECT user FROM ". static::table_main_players()." WHERE team=".$this->get_id();
 		$this->main_players = array();
-		foreach($wpdb->get_results($sql) as $stammspieler_id){
-			$this->main_players[] = $stammspieler_id->user;
+		foreach($wpdb->get_results($sql) as $main_player_id){
+			$this->main_players[] = $main_player_id->user;
 		}
 	}
 	
-	public function add_stammspieler($user){
+	public function add_main_player($user){
 		if(is_null($user)){
 			throw new Exception('Stammspieler ist null');
 		}
-		if($this->is_stammspieler($user)){
+		if($this->is_main_player($user)){
 			return;
 		}
 		global $wpdb;
 		$wpdb->insert(
-				static::table_stammspieler(),
+				static::table_main_players(),
 				array(
 						'team' => $this->id,
 						'user' => $user->ID
@@ -83,27 +83,27 @@ class Team extends WPDBObject{
 		$this->main_players[] = $user->ID;
 	}
 	
-	public function is_zusatzspieler($user){
+	public function is_additional_player($user){
 		if(is_null($this->additional_players)){
-			$this->load_zusatzspieler();
+			$this->load_additional_players();
 		}
 		return in_array($user->ID, $this->additional_players);
 	}
-	private function load_zusatzspieler(){
+	private function load_additional_players(){
 		global $wpdb;
-		$sql = "SELECT user FROM ". static::table_zusatzspieler()." WHERE team=".$this->get_id();
+		$sql = "SELECT user FROM ". static::table_additional_players()." WHERE team=".$this->get_id();
 		$this->additional_players = array();
-		foreach($wpdb->get_results($sql) as $zusatzspieler_id){
-			$this->additional_players[] = $zusatzspieler_id->user;
+		foreach($wpdb->get_results($sql) as $additional_player_id){
+			$this->additional_players[] = $additional_player_id->user;
 		}
 	}
-	public function add_zusatzspieler($user){
-		if($this->is_zusatzspieler($user)){
+	public function add_additional_player($user){
+		if($this->is_additional_player($user)){
 			return;
 		}
 		global $wpdb;
 		$wpdb->insert(
-				static::table_zusatzspieler(),
+				static::table_additional_players(),
 				array(
 						'team' => $this->id,
 						'user' => $user->ID
@@ -112,31 +112,31 @@ class Team extends WPDBObject{
 		$this->additional_players[] = $user->ID;
 	}
 
-	public static function add_stammspieler_to_team($team_id, $user_id){
+	public static function add_main_player_to_team($team_id, $user_id){
 		global $wpdb;
-		static::remove_zusatzspieler_from_team($team_id, $user_id);
+		static::remove_additional_player_from_team($team_id, $user_id);
 		
 		$team_user = array(	'team' => $team_id,	'user' => $user_id	);
-		$wpdb->insert(static::table_stammspieler(),	$team_user );
+		$wpdb->insert(static::table_main_players(),	$team_user );
 		return $user_id;
 	}
-	public static function remove_stammspieler_from_team($team_id, $user_id){
+	public static function remove_main_player_from_team($team_id, $user_id){
 		global $wpdb;
 		$team_user = array(	'team' => $team_id,	'user' => $user_id	);
-		$wpdb->delete(static::table_stammspieler(), $team_user );
+		$wpdb->delete(static::table_main_players(), $team_user );
 		return $user_id;
 	}
-	public static function add_zusatzspieler_to_team($team_id, $user_id){
+	public static function add_additional_player_to_team($team_id, $user_id){
 		global $wpdb;
-		static::remove_stammspieler_from_team($team_id, $user_id);
+		static::remove_main_player_from_team($team_id, $user_id);
 		$team_user = array(	'team' => $team_id,	'user' => $user_id	);
-		$wpdb->insert(static::table_zusatzspieler(),	$team_user );
+		$wpdb->insert(static::table_additional_players(),	$team_user );
 		return $user_id;
 	}
-	public static function remove_zusatzspieler_from_team($team_id, $user_id){
+	public static function remove_additional_player_from_team($team_id, $user_id){
 		global $wpdb;
 		$team_user = array(	'team' => $team_id,	'user' => $user_id	);
-		$wpdb->delete (static::table_zusatzspieler(), $team_user );
+		$wpdb->delete (static::table_additional_players(), $team_user );
 		return $user_id;
 	}
 	
@@ -148,17 +148,17 @@ class Team extends WPDBObject{
 		"CREATE TABLE ".static::table_name()." (
 			  id mediumint(9) unsigned NOT NULL AUTO_INCREMENT,
 			  name tinytext NOT NULL,
-			  trainer bigint(20) unsigned,
-			  cotrainer bigint(20) unsigned,
+			  coach bigint(20) unsigned,
+			  assistant_coach bigint(20) unsigned,
 			  PRIMARY KEY (id),
- 			  FOREIGN KEY (trainer) REFERENCES ".Player::table_name()."(ID),
- 			  FOREIGN KEY (cotrainer) REFERENCES ".Player::table_name()."(ID)
+ 			  FOREIGN KEY (coach) REFERENCES ".Player::table_name()."(ID),
+ 			  FOREIGN KEY (assistant_coach) REFERENCES ".Player::table_name()."(ID)
 		) ".$charset_collate.";";
 	
 		dbDelta( $sql );
 
 		$sql2 =
-		"CREATE TABLE ".static::table_stammspieler()." (
+		"CREATE TABLE ".static::table_main_players()." (
 			  team mediumint(9) unsigned NOT NULL,
 			  user bigint(20) unsigned NOT NULL,
  			  FOREIGN KEY (team) REFERENCES ".static::table_name()."(id),
@@ -167,7 +167,7 @@ class Team extends WPDBObject{
 		dbDelta( $sql2 );
 		
 		$sql3 =
-		"CREATE TABLE ".static::table_zusatzspieler()." (
+		"CREATE TABLE ".static::table_additional_players()." (
 			  team mediumint(9) unsigned NOT NULL,
 			  user bigint(20) unsigned NOT NULL,
  			  FOREIGN KEY (team) REFERENCES ".static::table_name()."(id),
@@ -176,37 +176,37 @@ class Team extends WPDBObject{
 		dbDelta( $sql3 );
 	}
 
-	public static function table_stammspieler(){
+	public static function table_main_players(){
 		return static::table_name().'_main_players';
 	}
-	public static function table_zusatzspieler(){
+	public static function table_additional_players(){
 		return static::table_name().'_additional_players';
 	}
 	
 	protected static function row_to_object($row_object){
 		return new Team(
 				$row_object->name, 
-				intval($row_object->trainer), 
-				intval($row_object->cotrainer), 
+				intval($row_object->coach), 
+				intval($row_object->assistant_coach), 
 				intval($row_object->id)
 		);
 	}
 	
 
 	/** Brauchbar als Ajax-Callbackfunction */
-	public static function set_trainer($team_id, $user_id){
+	public static function set_coach($team_id, $user_id){
 		global $wpdb;
-		$wpdb->update(static::table_name(), array('trainer' => $user_id), array('id' => $team_id));
-		$row = $wpdb->get_row( 'SELECT trainer FROM '.static::table_name().' WHERE id = '.$team_id );
-		return $row->trainer;
+		$wpdb->update(static::table_name(), array('coach' => $user_id), array('id' => $team_id));
+		$row = $wpdb->get_row( 'SELECT coach FROM '.static::table_name().' WHERE id = '.$team_id );
+		return $row->coach;
 	}
 	
 	/** Brauchbar als Ajax-Callbackfunction */
-	public static function set_cotrainer($team_id, $user_id){
+	public static function set_assistant_coach($team_id, $user_id){
 		global $wpdb;
-		$wpdb->update(static::table_name(), array('cotrainer' => $user_id), array('id' => $team_id));
-		$row = $wpdb->get_row( 'SELECT cotrainer FROM '.static::table_name().' WHERE id = '.$team_id );
-		return $row->cotrainer;
+		$wpdb->update(static::table_name(), array('assistant_coach' => $user_id), array('id' => $team_id));
+		$row = $wpdb->get_row( 'SELECT assistant_coach FROM '.static::table_name().' WHERE id = '.$team_id );
+		return $row->assistant_coach;
 	}
 }
 
